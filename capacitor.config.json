@@ -1,6 +1,6 @@
 {
   "appId": "com.sleepcbti.app",
-  "appName": "??��??",
+  "appName": "睡眠良方",
   "webDir": "client/dist",
   "android": {
     "allowMixedContent": true

@@ -5,8 +5,29 @@ require('dotenv').config();
 
 const app = express();
 
-// 中间件
-app.use(cors());
+// CORS：按域名白名单收紧（默认仅本地开发 + 可选 CORS_ORIGINS 环境变量扩展）
+const defaultOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:3000',
+  'https://yuhan-code.github.io', // GitHub Pages 部署域名（按需调整）
+];
+const extraOrigins = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+const allowedOrigins = [...defaultOrigins, ...extraOrigins];
+
+app.use(cors({
+  origin(origin, callback) {
+    // 无 Origin（同源/curl/服务端调用）放行；有 Origin 则校验白名单
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS 策略禁止该来源：' + origin));
+  },
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
