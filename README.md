@@ -9,8 +9,7 @@
 | 前端 `client/` | Vue 3 · Vite · Pinia · Vue Router |
 | 后端 `server/` | Node.js · Express 5 · MySQL (mysql2) · JWT |
 | AI 助手 | DeepSeek API（可选） |
-| 移动端 `android/` | Capacitor 8（Android 原生壳） |
-| 部署 | Railway（后端）+ GitHub Pages（`docs/` 前端静态站） |
+| 部署 | Railway（后端，可选）+ GitHub Pages（`docs/` 前端静态站） |
 
 ## 目录结构
 
@@ -21,14 +20,43 @@ client/          前端源码（Vue 3）
 server/          后端源码（Express）
   src/           路由 / 控制器 / 服务 / 中间件
   src/config/    数据库连接与量表配置（init.sql）
-android/         Capacitor Android 原生工程
 docs/            GitHub Pages 部署产物（由构建生成）
 ```
 
 ## 快速开始
 
-需要 Node.js ≥ 18。
+需要 Node.js ≥ 18，且本机装有 MySQL（如 XAMPP）。
 
+### 方式一：一键启动脚本（Windows 推荐）
+双击项目根目录的 **`start-server.bat`** 即可。
+脚本会自动：
+1. 检测 MySQL（3306）与后端（3000）是否已在运行，**避免重复启动**；
+2. 若未运行则先启动 MySQL，再启动后端；
+3. 后端启动后，浏览器访问 **http://localhost:3000**。
+
+> 保持运行脚本的那个窗口开着；按 `Ctrl+C` 可停止后端。
+
+### 方式二：手动启动
+后端依赖 MySQL，所以**顺序是先启动数据库，再启动后端**。
+```bash
+# 1) 启动 MySQL（XAMPP）
+#    方法 a：打开 XAMPP Control Panel → 点 MySQL → Start
+#    方法 b：命令行（保持窗口开着）
+cd C:\xampp\mysql\bin
+mysqld --defaults-file=my.ini
+
+# 2) 另开一个终端，启动后端
+cd "E:\ai generated\ai项目\作品3\server"
+npm start          # 保持窗口开着
+```
+启动成功后终端会显示：
+```
+✅ 数据库连接成功
+🚀 睡益良方 CBT-I 服务已启动 → http://localhost:3000
+```
+浏览器打开 **http://localhost:3000**（管理员：`admin / 123456`）。
+
+### 首次准备（仅一次）
 ```bash
 # 1. 安装依赖
 npm run install:all
@@ -37,16 +65,8 @@ npm run install:all
 cp server/.env.example server/.env
 #    编辑 server/.env，填写数据库连接与 JWT 密钥
 
-# 3. 初始化数据库
-#    执行 server/src/config/init.sql（见文件内注释）
-
-# 4. 生成客户端 API 地址配置
-#    client/public/api-config.json：{"apiBase": "http://localhost:3000/api"}
-
-# 5. 启动后端（前端可在浏览器直接访问 dev server）
-npm start
-# 前端开发模式（可选）：
-cd client && npm run dev
+# 3. 初始化数据库（建表）
+#    连接你的 MySQL 后执行 server/src/config/init.sql
 ```
 
 ## 可用脚本
