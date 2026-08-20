@@ -49,6 +49,18 @@ async function initCommunityTables() {
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='话题圈帖子'
   `);
+
+  await pool.execute(`
+    CREATE TABLE IF NOT EXISTS post_likes (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      post_id INT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE KEY uk_user_post (user_id, post_id),
+      CONSTRAINT fk_like_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      CONSTRAINT fk_like_post FOREIGN KEY (post_id) REFERENCES topic_posts(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='帖子点赞记录（一人一帖只能点一次，可取消）'
+  `);
 }
 
 // 首次引入时初始化表
@@ -376,6 +388,7 @@ async function getPostList(req, res) {
   try {
     const { page = 1, limit = 20 } = req.query;
     const offset = (parseInt(page) - 1) * parseInt(limit);
+    const currentUserId = req.user ? req.user.id : null;
 
     const [posts] = await pool.execute(
       `SELECT id, display_name, sanitized_content as content, likes, created_at
@@ -390,6 +403,18 @@ async function getPostList(req, res) {
       'SELECT COUNT(*) as cnt FROM topic_posts WHERE is_approved = 1'
     );
 
+    // 查询当前用户点赞过的帖子 id（用于前端高亮心形、判断能否取消）
+    let likedSet = new Set();
+    if (currentUserId && posts.length > 0) {
+      const ids = posts.map(p => p.id);
+      const placeholders = ids.map(() => '?').join(',');
+      const [liked] = await pool.execute(
+        `SELECT post_id FROM post_likes WHERE user_id = ? AND post_id IN (${placeholders})`,
+        [currentUserId, ...ids]
+      );
+      liked.forEach(r => likedSet.add(r.post_id));
+    }
+
     res.json({
       code: 200,
       data: {
@@ -397,6 +422,7 @@ async function getPostList(req, res) {
           ...p,
           content: p.content || '(内容已编辑)',
           timeAgo: timeAgo(p.created_at),
+          likedByMe: likedSet.has(p.id),
         })),
         total: total[0].cnt,
         page: parseInt(page),
@@ -457,19 +483,61 @@ async function createPost(req, res) {
 }
 
 /**
- * 点赞帖子
+ * 点赞/取消点赞帖子（toggle）
+ * 使用 JWT 中的用户 id，确保：
+ *  - 同一个用户对同一帖子只能点一次赞（post_likes 表唯一约束）→ 修复"可多次点赞"bug
+ *  - 再次点击则取消点赞（点赞数 -1）→ 支持取消
  */
 async function likePost(req, res) {
   try {
     const { postId } = req.params;
+    const userId = req.user ? req.user.id : null;
 
+    if (!userId) {
+      return res.status(401).json({ code: 401, message: '请先登录' });
+    }
+
+    // 确认帖子存在
+    const [postRows] = await pool.execute(
+      'SELECT id FROM topic_posts WHERE id = ? AND is_approved = 1',
+      [postId]
+    );
+    if (postRows.length === 0) {
+      return res.status(404).json({ code: 404, message: '帖子不存在' });
+    }
+
+    // 判断当前是否已点赞
+    const [likedRows] = await pool.execute(
+      'SELECT id FROM post_likes WHERE user_id = ? AND post_id = ?',
+      [userId, postId]
+    );
+
+    if (likedRows.length > 0) {
+      // 已点赞 → 取消
+      await pool.execute(
+        'DELETE FROM post_likes WHERE user_id = ? AND post_id = ?',
+        [userId, postId]
+      );
+      await pool.execute(
+        'UPDATE topic_posts SET likes = GREATEST(likes - 1, 0) WHERE id = ?',
+        [postId]
+      );
+      return res.json({ code: 200, message: '已取消点赞', liked: false });
+    }
+
+    // 未点赞 → 点赞
+    await pool.execute(
+      'INSERT INTO post_likes (user_id, post_id) VALUES (?, ?)',
+      [userId, postId]
+    );
     await pool.execute(
       'UPDATE topic_posts SET likes = likes + 1 WHERE id = ?',
       [postId]
     );
 
-    res.json({ code: 200, message: '已点赞' });
+    res.json({ code: 200, message: '已点赞', liked: true });
   } catch (error) {
+    console.error('点赞失败:', error);
     res.status(500).json({ code: 500, message: '操作失败' });
   }
 }

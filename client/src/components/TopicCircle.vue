@@ -33,8 +33,12 @@
         </div>
         <p class="post-content">{{ post.content }}</p>
         <div class="post-footer">
-          <button class="btn-like" @click="doLike(post.id)">
-            ❤️ {{ post.likes || 0 }}
+          <button
+            class="btn-like"
+            :class="{ liked: post.likedByMe }"
+            @click="doLike(post.id)"
+          >
+            {{ post.likedByMe ? '❤️' : '🤍' }} {{ post.likes || 0 }}
           </button>
         </div>
       </div>
@@ -114,9 +118,17 @@ async function doPost() {
 
 async function doLike(postId) {
   try {
-    await likePost(postId);
+    const res = await likePost(postId);
     const post = posts.value.find(p => p.id === postId);
-    if (post) post.likes = (post.likes || 0) + 1;
+    if (!post) return;
+    // 后端返回 liked 状态，据此增/减点赞数并切换高亮（支持点赞/取消）
+    if (res.liked) {
+      post.likedByMe = true;
+      post.likes = (post.likes || 0) + 1;
+    } else {
+      post.likedByMe = false;
+      post.likes = Math.max((post.likes || 0) - 1, 0);
+    }
   } catch {}
 }
 
@@ -229,6 +241,12 @@ onMounted(() => loadPosts());
 }
 
 .btn-like:hover { border-color: #ffccc7; color: #ff4d4f; }
+
+.btn-like.liked {
+  border-color: #ffccc7;
+  background: #fff1f0;
+  color: #ff4d4f;
+}
 
 /* 空状态 */
 .empty-state {
