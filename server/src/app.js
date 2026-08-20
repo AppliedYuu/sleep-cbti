@@ -10,7 +10,7 @@ const defaultOrigins = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
   'http://localhost:3000',
-  'https://yuhan-code.github.io', // GitHub Pages 部署域名（按需调整）
+  'https://AppliedYuu.github.io', // GitHub Pages 部署域名（项目页 https://AppliedYuu.github.io/sleep-cbti/）
 ];
 const extraOrigins = (process.env.CORS_ORIGINS || '')
   .split(',')
