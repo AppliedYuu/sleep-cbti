@@ -74,13 +74,40 @@ if "%PORT_IN_USE%"=="1" (
 )
 
 echo.
-echo [2/2] Starting backend ...
+echo [2/2] Starting backend (detached, stays alive after this window closes) ...
 echo        frontend : http://localhost:3000
 echo        health   : http://localhost:3000/api/health
-echo        Press Ctrl+C to stop.
+echo        log      : %PROJECT%server\server.log
 echo --------------------------------------------
 cd /d "%PROJECT%server"
-call npm start
+rem Redirect output to a log file and launch detached, so it does NOT die
+rem or slow down when this console window is closed. Net effect: the backend
+rem keeps running independently; stop it any time with stop-all.bat
+start "" /b cmd /c "node src/index.js > server.log 2>&1"
+
+rem wait until /api/health returns 200 (up to 30s)
+echo       Waiting for backend (max 30s) ...
+set /a BTRIES=0
+:wait_backend_loop
+set /a BTRIES+=1
+if %BTRIES% gtr 30 (
+    echo [WARN] Backend not responding yet. See server.log for errors.
+    goto backend_detached_done
+)
+call :is_backend_healthy
+if "!HEALTHY!"=="1" (
+    echo [OK] backend healthy (port 3000)
+    goto backend_detached_done
+)
+timeout /t 1 /nobreak >nul
+goto wait_backend_loop
+
+:backend_detached_done
+echo.
+echo The backend now runs independently of this window.
+echo You can close this window safely.
+echo To stop it later: double-click stop-all.bat
+timeout /t 8 /nobreak >nul
 goto end
 
 :backend_exists
