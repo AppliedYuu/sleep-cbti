@@ -19,3 +19,13 @@ export function getProfile() {
 export function changePassword(oldPassword, newPassword) {
   return request.post('/auth/change-password', { oldPassword, newPassword });
 }
+
+/** 获取界面设置（背景色/字体颜色） */
+export function getSettings() {
+  return request.get('/auth/settings');
+}
+
+/** 保存界面设置 */
+export function updateSettings(settings) {
+  return request.put('/auth/settings', settings);
+}

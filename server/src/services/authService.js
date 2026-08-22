@@ -36,6 +36,8 @@ async function initAuthTables() {
     `ALTER TABLE users ADD COLUMN username VARCHAR(100) UNIQUE`,
     `ALTER TABLE users ADD COLUMN password_hash VARCHAR(255)`,
     `ALTER TABLE users ADD COLUMN role ENUM('user','admin') DEFAULT 'user'`,
+    `ALTER TABLE users ADD COLUMN bg_color VARCHAR(20) DEFAULT '#E7DFCA' COMMENT '背景色'`,
+    `ALTER TABLE users ADD COLUMN text_color VARCHAR(20) DEFAULT '#4A4A47' COMMENT '字体颜色'`,
   ];
   for (const q of alterQueries) {
     try { await pool.execute(q); } catch { /* 字段已存在 */ }

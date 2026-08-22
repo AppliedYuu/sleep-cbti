@@ -7,7 +7,7 @@
         <template v-if="authStore.isLoggedIn">
           <span class="user-name">{{ authStore.user?.nickname || authStore.user?.username }}</span>
           <button class="nav-link" @click="notifyRef?.open()">通知</button>
-          <button class="nav-link" @click="handleLogout">退出</button>
+          <button class="nav-link" @click="settingsRef?.open()">设置</button>
         </template>
         <template v-else>
           <router-link to="/login" class="nav-link">登录</router-link>
@@ -96,6 +96,7 @@
     </nav>
 
     <NotifySetting ref="notifyRef" />
+    <SettingsPanel ref="settingsRef" />
 
     <div v-if="toastMsg" class="toast">{{ toastMsg }}</div>
   </div>
@@ -103,13 +104,13 @@
 
 <script setup>
 import { ref, reactive, watch } from 'vue';
-import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import request from '@/api/request';
 import NotifySetting from '@/components/NotifySetting.vue';
+import SettingsPanel from '@/components/SettingsPanel.vue';
 
-const router = useRouter();
 const notifyRef = ref(null);
+const settingsRef = ref(null);
 const authStore = useAuthStore();
 const toastMsg = ref('');
 const dash = reactive({ latestScore: null, avgDuration: null, avgEfficiency: null });
@@ -124,11 +125,6 @@ async function loadDash() {
 }
 
 watch(() => authStore.user?.id, id => { if (id) loadDash(); }, { immediate: true });
-
-function handleLogout() {
-  authStore.logout();
-  router.push('/login');
-}
 
 function showToast(msg) {
   toastMsg.value = msg;

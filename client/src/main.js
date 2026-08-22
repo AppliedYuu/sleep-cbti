@@ -37,6 +37,15 @@ async function initApp() {
       const { useAuthStore } = await import('@/stores/auth');
       const authStore = useAuthStore();
       await authStore.fetchProfile();
+      // 加载用户界面设置（背景色/字体颜色）并应用
+      const { getSettings } = await import('@/api/auth');
+      const { applyTheme, DEFAULT_THEME } = await import('@/utils/theme');
+      try {
+        const res = await getSettings();
+        applyTheme(res?.data || DEFAULT_THEME);
+      } catch {
+        applyTheme(DEFAULT_THEME);
+      }
     } catch {
       // token 无效，忽略
     }
