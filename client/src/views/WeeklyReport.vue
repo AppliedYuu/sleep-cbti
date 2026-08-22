@@ -1,375 +1,316 @@
 <template>
   <div class="report-page">
-    <div class="report-header">
+    <header class="page-header">
       <router-link to="/" class="btn-back-link">← 返回首页</router-link>
-      <h1>📊 睡眠改善周报</h1>
-      <div class="week-picker">
-        <button class="btn-week" @click="prevWeek">◀</button>
-        <span class="week-range">{{ displayWeekRange }}</span>
-        <button class="btn-week" @click="nextWeek" :disabled="isCurrentWeek">▶</button>
-      </div>
-    </div>
+      <h1 class="serif">睡眠改善周报</h1>
+      <p>每周数据总结 · 趋势分析 · 改善建议</p>
+    </header>
 
-    <div v-if="loading" class="loading">加载中...</div>
+    <nav class="week-picker">
+      <button class="btn-week" @click="prevWeek">‹ 前一周</button>
+      <span class="week-range serif">{{ displayWeekRange }}</span>
+      <button class="btn-week" @click="nextWeek" :disabled="isCurrentWeek">后一周 ›</button>
+    </nav>
 
-    <div v-else-if="!report.ready" class="not-ready">
-      <span class="nr-icon">📭</span>
-      <p>{{ report.message || '本周暂无数据' }}</p>
-      <router-link to="/diary" class="btn-to-diary">📓 去记录睡眠日记</router-link>
-    </div>
+    <p v-if="loading" class="status">加载中…</p>
+    <p v-else-if="!hasData" class="status">
+      本周还没有足够的睡眠日记数据。
+      <router-link to="/diary" class="status-link">去记录 →</router-link>
+    </p>
 
-    <div v-else>
-      <!-- 评级 -->
-      <div class="rating-card" :style="{ borderColor: report.rating.color }">
-        <span class="rating-emoji">{{ report.rating.emoji }}</span>
-        <div class="rating-info">
-          <span class="rating-level" :style="{ color: report.rating.color }">{{ report.rating.level }}</span>
-          <span class="rating-score">综合评分 {{ report.rating.score }} 分</span>
+    <template v-else>
+      <!-- 总体评级 -->
+      <section class="rating-card">
+        <div class="rating-row">
+          <span class="rating-mark serif">{{ rating.emoji }}</span>
+          <div class="rating-meta">
+            <span class="rating-level serif">{{ rating.level }}</span>
+            <span class="rating-score">{{ reportData.avgEfficiency }}% · 睡眠效率</span>
+          </div>
         </div>
-      </div>
+      </section>
 
+      <!-- 数据指标 -->
       <section class="section">
-        <h3>🔑 关键指标</h3>
+        <h2 class="serif">数据指标</h2>
         <div class="metrics-grid">
           <div class="metric-item">
-            <span class="metric-val">{{ report.current.avgEfficiency }}%</span>
-            <span class="metric-label">睡眠效率</span>
+            <span class="metric-val serif">{{ reportData.avgDuration }}h</span>
+            <span class="metric-label">平均时长</span>
           </div>
           <div class="metric-item">
-            <span class="metric-val">{{ report.current.avgLatency }}分钟</span>
-            <span class="metric-label">入睡耗时</span>
+            <span class="metric-val serif">{{ reportData.avgEfficiency }}%</span>
+            <span class="metric-label">平均效率</span>
           </div>
           <div class="metric-item">
-            <span class="metric-val">{{ report.current.avgEnergy }}/10</span>
-            <span class="metric-label">日间精力</span>
+            <span class="metric-val serif">{{ reportData.avgLatency }}</span>
+            <span class="metric-label">入睡耗时 (分)</span>
           </div>
           <div class="metric-item">
-            <span class="metric-val">{{ report.current.diaryCount }}天</span>
-            <span class="metric-label">记录天数</span>
+            <span class="metric-val serif">{{ reportData.avgAwakenings }}</span>
+            <span class="metric-label">夜醒次数</span>
           </div>
         </div>
       </section>
 
-      <section class="section" v-if="report.highlights?.length">
-        <h3>✨ 亮点</h3>
-        <div v-for="(h, i) in report.highlights" :key="i" class="highlight-item">
-          <span class="hi-icon">{{ h.icon }}</span> {{ h.text }}
-        </div>
+      <!-- 亮点 -->
+      <section v-if="highlights.length" class="section">
+        <h2 class="serif">本周亮点</h2>
+        <ul class="plain-list">
+          <li v-for="(h, i) in highlights" :key="i" class="highlight-item">
+            <span class="hi-mark" aria-hidden="true">·</span>
+            <span class="hi-text">{{ h }}</span>
+          </li>
+        </ul>
       </section>
 
-      <section class="section">
-        <h3>💡 建议</h3>
-        <div v-for="(s, i) in report.suggestions" :key="i" class="suggestion-item">
-          <span class="si-dot">{{ i + 1 }}</span> {{ s }}
-        </div>
+      <!-- 改善建议 -->
+      <section v-if="suggestions.length" class="section">
+        <h2 class="serif">改善建议</h2>
+        <ol class="plain-list">
+          <li v-for="(s, i) in suggestions" :key="i" class="suggestion-item">
+            <span class="si-num serif">{{ i + 1 }}.</span>
+            <span class="si-text">{{ s }}</span>
+          </li>
+        </ol>
       </section>
-    </div>
+
+      <router-link to="/diary" class="btn-to-diary">查看我的睡眠日记 →</router-link>
+    </template>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
-import { useAuthStore } from '@/stores/auth';
+import { ref, computed, onMounted } from 'vue';
 import request from '@/api/request';
+import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
-const loading = ref(false);
-const report = ref({ ready: false });
-const weekOffset = ref(0);
+const userId = computed(() => authStore.user?.id);
 
-const displayWeekRange = computed(() => {
-  const { start, end } = getWeekDates(weekOffset.value);
-  return `${start} ~ ${end}`;
-});
+const weekOffset = ref(0);
+const reportData = ref(null);
+const loading = ref(true);
 const isCurrentWeek = computed(() => weekOffset.value >= 0);
 
-function getWeekDates(offset) {
-  const now = new Date();
-  now.setDate(now.getDate() + offset * 7);
-  const dow = now.getDay();
-  const monOff = dow === 0 ? -6 : 1 - dow;
-  const mon = new Date(now);
-  mon.setDate(now.getDate() + monOff);
-  const sun = new Date(mon);
-  sun.setDate(mon.getDate() + 6);
-  return { start: mon.toISOString().slice(0, 10), end: sun.toISOString().slice(0, 10) };
-}
+const rating = computed(() => {
+  if (!reportData.value) return { level: '', emoji: '' };
+  const e = reportData.value.avgEfficiency;
+  if (e >= 85) return { level: '睡眠状态良好', emoji: '良' };
+  if (e >= 75) return { level: '睡眠状态平稳', emoji: '平' };
+  return { level: '需要关注', emoji: '差' };
+});
 
-function prevWeek() { weekOffset.value--; doLoad(); }
-function nextWeek() { if (!isCurrentWeek.value) { weekOffset.value++; doLoad(); } }
+const hasData = computed(() => reportData.value && reportData.value.avgDuration);
 
-async function doLoad() {
-  const id = authStore.user?.id;
-  if (!id) return;
+const displayWeekRange = computed(() => {
+  const end = new Date();
+  end.setDate(end.getDate() + weekOffset.value * 7);
+  const start = new Date(end);
+  start.setDate(end.getDate() - 6);
+  const f = d => `${d.getMonth() + 1}.${d.getDate()}`;
+  return `${f(start)} – ${f(end)}`;
+});
+
+const highlights = computed(() => reportData.value?.highlights || []);
+const suggestions = computed(() => reportData.value?.suggestions || []);
+
+async function load() {
   loading.value = true;
   try {
-    const { start, end } = getWeekDates(weekOffset.value);
-    const res = await request.get('/report/weekly/' + id, { params: { weekStart: start, weekEnd: end } });
-    report.value = res.data || { ready: false };
-  } catch(e) {
-    report.value = { ready: false, message: '加载失败' };
-    console.error(e);
+    const res = await request.get(`/report/${userId.value}?week=${weekOffset.value}`);
+    reportData.value = res.data;
+  } catch {
+    reportData.value = null;
+  } finally {
+    loading.value = false;
   }
-  loading.value = false;
+}
+function prevWeek() { weekOffset.value -= 1; load(); }
+function nextWeek() {
+  if (isCurrentWeek.value) return;
+  weekOffset.value += 1;
+  load();
 }
 
-watch(() => authStore.user?.id, id => { if (id) doLoad(); }, { immediate: true });
+onMounted(load);
 </script>
 
 <style scoped>
-/* 静谧夜空 · 睡眠改善周报 */
 .report-page {
   min-height: 100vh;
-  /* 夜空背景：与全局 body 渐变保持一致 */
-  background:
-    radial-gradient(900px 500px at 50% -10%, rgba(138, 180, 248, 0.12), transparent 60%),
-    radial-gradient(700px 420px at 85% 15%, rgba(183, 148, 246, 0.10), transparent 55%),
-    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-base) 60%, #0c1124 100%);
-  padding: 0 1.1rem 3rem;
-  color: var(--text-base);
-  animation: rise-in var(--dur-slow) var(--ease-out) both;
+  padding: 1rem 1.4rem 3rem;
 }
 
-@keyframes rise-in {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
+.page-header {
+  padding: 0.6rem 0 1.4rem;
+  border-bottom: 1px solid var(--bg-line);
+  margin-bottom: 1rem;
 }
-
-.report-header {
-  padding: 1.5rem 0.4rem 1rem;
-  text-align: center;
-  background: linear-gradient(135deg, rgba(125, 211, 252, 0.18), rgba(138, 180, 248, 0.12));
-  border: 1px solid var(--border-soft);
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: var(--shadow-soft);
-}
-
 .btn-back-link {
   display: inline-block;
-  color: var(--accent-cyan);
+  color: var(--text-muted);
   text-decoration: none;
   font-size: var(--fs-sm);
-  margin-bottom: var(--space-2);
-  transition: color var(--dur-fast) var(--ease-out);
+  margin-bottom: 0.6rem;
+  transition: color var(--dur) var(--ease);
 }
 .btn-back-link:hover { color: var(--text-strong); }
-
-.report-header h1 {
+.page-header h1 {
   font-size: var(--fs-xl);
+  font-weight: 500;
   color: var(--text-strong);
-  background: linear-gradient(135deg, #fff 0%, var(--accent-cyan) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 24px rgba(125, 211, 252, 0.25);
+  letter-spacing: 0.04em;
+  margin-bottom: 0.3rem;
+}
+.page-header p {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
 }
 
 .week-picker {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-  margin-top: var(--space-2);
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--bg-line);
+  margin-bottom: 1.4rem;
 }
-
 .btn-week {
-  background: var(--bg-glass);
-  border: 1px solid var(--border-mid);
-  color: var(--accent-cyan);
-  padding: 0.3rem 0.7rem;
-  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-base);
+  font-family: inherit;
   font-size: var(--fs-sm);
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: transform var(--dur-fast) var(--ease-out),
-              border-color var(--dur-fast) var(--ease-out),
-              box-shadow var(--dur-fast) var(--ease-out);
+  transition: border-color var(--dur) var(--ease),
+              color var(--dur) var(--ease);
 }
 .btn-week:hover:not(:disabled) {
-  border-color: var(--border-glow);
-  box-shadow: var(--glow-primary);
-  transform: translateY(-2px);
+  border-color: var(--primary);
+  color: var(--primary);
 }
-.btn-week:active:not(:disabled) { transform: scale(0.95); }
-.btn-week:disabled { opacity: 0.3; cursor: not-allowed; }
-
+.btn-week:disabled { opacity: 0.4; cursor: not-allowed; }
 .week-range {
-  font-size: var(--fs-sm);
-  min-width: 180px;
-  color: var(--text-base);
+  font-size: var(--fs-md);
+  color: var(--text-strong);
 }
 
-.loading, .not-ready {
+.status {
   text-align: center;
-  padding: 3rem 1rem;
   color: var(--text-muted);
+  padding: 3rem 0;
+  font-size: var(--fs-sm);
 }
-.loading { animation: pulse 1.6s ease-in-out infinite; }
-@keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
-
-.nr-icon {
-  font-size: 3rem;
+.status-link {
   display: block;
-  margin-bottom: var(--space-2);
-  filter: drop-shadow(0 0 14px var(--primary-glow));
-}
-
-.btn-to-diary {
-  display: inline-block;
-  padding: 0.6rem 1.5rem;
-  background: var(--accent-cyan);
-  color: var(--bg-deep);
-  border-radius: var(--radius-pill);
+  margin-top: 0.8rem;
+  color: var(--primary);
   text-decoration: none;
-  margin-top: var(--space-3);
-  font-weight: 600;
-  box-shadow: 0 0 22px rgba(125, 211, 252, 0.35);
-  transition: transform var(--dur-fast) var(--ease-out),
-              box-shadow var(--dur-fast) var(--ease-out);
-}
-.btn-to-diary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 28px rgba(125, 211, 252, 0.5);
 }
 
-/* 玻璃卡片：评级卡 */
 .rating-card {
+  padding: 1.2rem 0;
+  border-bottom: 1px solid var(--bg-line);
+  margin-bottom: 1.4rem;
+}
+.rating-row {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  margin: var(--space-3) 0;
-  padding: var(--space-3);
-  background: var(--bg-glass);
-  border: 1px solid var(--border-soft);
-  border-left: 6px solid var(--accent-cyan);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: transform var(--dur-base) var(--ease-out),
-              box-shadow var(--dur-base) var(--ease-out);
+  gap: 1rem;
 }
-.rating-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-card), 0 0 24px rgba(125, 211, 252, 0.22);
+.rating-mark {
+  font-size: 2.4rem;
+  color: var(--primary);
+  font-weight: 500;
+  line-height: 1;
 }
-
-.rating-emoji {
-  font-size: 2.5rem;
-  filter: drop-shadow(0 0 14px var(--primary-glow));
+.rating-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
-
 .rating-level {
-  font-size: var(--fs-xl);
-  font-weight: 700;
-  display: block;
+  font-size: var(--fs-lg);
   color: var(--text-strong);
-  text-shadow: 0 0 16px var(--primary-glow);
 }
-
 .rating-score {
   font-size: var(--fs-sm);
   color: var(--text-muted);
 }
 
-/* 玻璃卡片：各区块 */
 .section {
-  margin: var(--space-3) 0;
-  background: var(--bg-glass);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-md);
-  padding: var(--space-3);
-  box-shadow: var(--shadow-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: transform var(--dur-base) var(--ease-out),
-              box-shadow var(--dur-base) var(--ease-out);
+  padding: 1.2rem 0;
+  border-bottom: 1px solid var(--bg-line);
 }
-.section:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-card), 0 0 20px rgba(125, 211, 252, 0.18);
-}
-
-.section h3 {
-  font-size: var(--fs-md);
-  margin-bottom: var(--space-2);
+.section h2 {
+  font-size: var(--fs-lg);
+  font-weight: 500;
   color: var(--text-strong);
+  margin-bottom: 0.9rem;
 }
 
 .metrics-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-2);
+  gap: 1rem 1.4rem;
 }
-
-/* 指标块：趋势数据底色，cyan → primary 渐变描边感 */
 .metric-item {
-  text-align: center;
-  padding: var(--space-2);
-  background: var(--bg-soft);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-sm);
-  transition: transform var(--dur-fast) var(--ease-out),
-              border-color var(--dur-fast) var(--ease-out);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
 }
-.metric-item:hover {
-  transform: translateY(-2px);
-  border-color: var(--border-glow);
-}
-
 .metric-val {
-  display: block;
-  font-size: var(--fs-xl);
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 500;
   color: var(--text-strong);
-  text-shadow: 0 0 16px rgba(125, 211, 252, 0.35);
+  line-height: 1;
 }
-
 .metric-label {
   font-size: var(--fs-xs);
   color: var(--text-muted);
-  margin-top: 0.2rem;
 }
 
-/* 亮点：正向趋势用 mint 强调 */
-.highlight-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  font-size: var(--fs-sm);
-  color: var(--text-base);
-  padding: 0.3rem 0;
-}
-.highlight-item .hi-icon {
-  flex-shrink: 0;
-  filter: drop-shadow(0 0 8px var(--glow-mint));
-}
-
-/* 建议项 */
+.plain-list { list-style: none; }
+.highlight-item,
 .suggestion-item {
   display: flex;
-  align-items: flex-start;
-  gap: var(--space-1);
+  gap: 0.6rem;
+  padding: 0.55rem 0;
   font-size: var(--fs-sm);
+  color: var(--text-base);
+  line-height: 1.7;
+}
+.hi-mark {
+  color: var(--primary);
+  font-weight: 600;
+}
+.si-num {
   color: var(--text-muted);
-  padding: 0.3rem 0;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.hi-text, .si-text {
+  color: var(--text-base);
+  flex: 1;
 }
 
-.si-dot {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--accent-cyan);
-  color: var(--bg-deep);
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 0 12px rgba(125, 211, 252, 0.4);
+.btn-to-diary {
+  display: block;
+  text-align: center;
+  margin-top: 1.6rem;
+  padding: 0.7rem;
+  color: var(--primary);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
+  transition: border-color var(--dur) var(--ease),
+              color var(--dur) var(--ease);
+}
+.btn-to-diary:hover {
+  border-color: var(--primary);
 }
 </style>

@@ -13,9 +13,10 @@
 </script>
 
 <style>
-/* 全局基础样式已迁移至 styles/theme.css（静谧夜空主题） */
+/* 全局基础样式已迁移至 styles/theme.css */
 #app-container {
   display: flex;
   flex-direction: column;
+  background: transparent;
 }
 </style>
