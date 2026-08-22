@@ -170,54 +170,82 @@ function goToDiary() {
 .report-page {
   padding-bottom: 100px;
   min-height: 100vh;
-  background: #f5f7fa;
+  background: var(--bg-base);
+  color: var(--text-base);
 }
 
 .report-header {
   padding: 1.5rem 1.2rem 1rem;
-  background: linear-gradient(135deg, #4a6fa5, #6b8fc5);
-  color: #fff;
+  background: linear-gradient(135deg, rgba(138, 180, 248, 0.18), rgba(183, 148, 246, 0.14));
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--text-strong);
   text-align: center;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .btn-back {
-  background: rgba(255,255,255,0.2);
-  border: none;
-  color: #fff;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-soft);
+  color: var(--text-strong);
   padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
   cursor: pointer;
   margin-bottom: 0.5rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background var(--dur-fast) var(--ease-out),
+              transform var(--dur-fast) var(--ease-out);
+}
+
+.btn-back:hover {
+  background: var(--bg-hover);
+}
+
+.btn-back:active {
+  transform: scale(0.98);
 }
 
 .report-header h1 {
   font-size: 1.3rem;
+  color: var(--text-strong);
+  text-shadow: var(--glow-primary);
 }
 
 .report-date {
-  font-size: 0.8rem;
-  opacity: 0.8;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
   margin-top: 0.3rem;
 }
 
 .report-section {
-  background: #fff;
+  background: var(--bg-glass);
   margin: 0.8rem 1.2rem;
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   padding: 1.2rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform var(--dur-base) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out);
+}
+
+.report-section:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-soft), var(--glow-primary);
 }
 
 .report-section h2 {
   font-size: 1.05rem;
-  color: #333;
+  color: var(--text-strong);
   margin-bottom: 0.3rem;
 }
 
 .section-desc {
-  font-size: 0.78rem;
-  color: #999;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
   margin-bottom: 0.8rem;
 }
 
@@ -232,14 +260,35 @@ function goToDiary() {
   min-width: 90px;
   text-align: center;
   padding: 0.8rem 0.5rem;
-  border-radius: 12px;
-  background: #f9f9f9;
+  border-radius: var(--radius-md);
+  background: var(--bg-soft);
+  border: 1px solid var(--border-soft);
+  transition: transform var(--dur-base) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out);
 }
 
-.result-card.good { background: #f0fff0; border: 1px solid #b7eb8f; }
-.result-card.fair { background: #fffbe6; border: 1px solid #ffe58f; }
-.result-card.warn { background: #fff2e8; border: 1px solid #ffbb96; }
-.result-card.bad { background: #fff1f0; border: 1px solid #ffa39e; }
+.result-card:hover {
+  transform: translateY(-3px);
+}
+
+.result-card.good {
+  background: rgba(94, 234, 212, 0.10);
+  border: 1px solid rgba(94, 234, 212, 0.45);
+  box-shadow: var(--glow-mint);
+}
+.result-card.fair {
+  background: rgba(255, 210, 138, 0.10);
+  border: 1px solid rgba(255, 210, 138, 0.45);
+  box-shadow: var(--glow-amber);
+}
+.result-card.warn {
+  background: rgba(255, 138, 155, 0.10);
+  border: 1px solid rgba(255, 138, 155, 0.45);
+}
+.result-card.bad {
+  background: rgba(255, 107, 107, 0.10);
+  border: 1px solid rgba(255, 107, 107, 0.45);
+}
 
 .rc-header {
   display: flex;
@@ -250,27 +299,34 @@ function goToDiary() {
 }
 
 .rc-icon { font-size: 1.1rem; }
-.rc-name { font-size: 0.8rem; font-weight: 700; color: #666; }
+.rc-name { font-size: var(--fs-sm); font-weight: 700; color: var(--text-muted); }
 
 .rc-score {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #333;
+  color: var(--text-strong);
+  text-shadow: var(--glow-primary);
 }
 
-.rc-score small { font-size: 0.75rem; color: #999; }
-.rc-level { font-size: 0.75rem; color: #666; margin-top: 0.2rem; }
+.result-card.good .rc-score { color: var(--accent-mint); text-shadow: var(--glow-mint); }
+.result-card.fair .rc-score { color: var(--warning); text-shadow: var(--glow-amber); }
+.result-card.warn .rc-score { color: var(--accent-amber); text-shadow: var(--glow-amber); }
+.result-card.bad .rc-score { color: var(--danger); }
+
+.rc-score small { font-size: var(--fs-xs); color: var(--text-muted); }
+.rc-level { font-size: var(--fs-xs); color: var(--text-muted); margin-top: 0.2rem; }
 
 .summary-box {
-  background: #f8f9ff;
-  border-radius: 10px;
+  background: var(--bg-soft);
+  border-radius: var(--radius-sm);
   padding: 1rem;
-  border-left: 3px solid #4a6fa5;
+  border-left: 3px solid var(--primary);
+  box-shadow: inset 0 0 0 1px var(--border-soft);
 }
 
 .summary-box p {
-  font-size: 0.9rem;
-  color: #555;
+  font-size: var(--fs-md);
+  color: var(--text-base);
   line-height: 1.6;
 }
 
@@ -282,19 +338,28 @@ function goToDiary() {
 
 .intervention-card {
   padding: 1rem;
-  border-radius: 12px;
-  background: #fafafa;
-  border: 1px solid #eee;
+  border-radius: var(--radius-md);
+  background: var(--bg-soft);
+  border: 1px solid var(--border-soft);
+  transition: transform var(--dur-base) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out);
+}
+
+.intervention-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-soft);
 }
 
 .intervention-card.priority-high {
-  background: #f0f5ff;
-  border-color: #adc6ff;
+  background: rgba(138, 180, 248, 0.12);
+  border-color: var(--border-glow);
+  box-shadow: var(--glow-primary);
 }
 
 .intervention-card.priority-medium {
-  background: #fffbe6;
-  border-color: #ffe58f;
+  background: rgba(255, 210, 138, 0.10);
+  border-color: rgba(255, 210, 138, 0.40);
+  box-shadow: var(--glow-amber);
 }
 
 .int-header {
@@ -305,27 +370,27 @@ function goToDiary() {
 }
 
 .int-priority {
-  font-size: 0.72rem;
+  font-size: var(--fs-xs);
   padding: 0.15rem 0.5rem;
-  border-radius: 10px;
+  border-radius: var(--radius-pill);
   font-weight: 600;
 }
 
-.int-priority.high { background: #4a6fa5; color: #fff; }
-.int-priority.medium { background: #faad14; color: #fff; }
-.int-priority.low { background: #d9d9d9; color: #666; }
+.int-priority.high { background: var(--primary); color: var(--text-on-primary); }
+.int-priority.medium { background: var(--accent-amber); color: var(--bg-deep); }
+.int-priority.low { background: var(--bg-elevated); color: var(--text-muted); border: 1px solid var(--border-soft); }
 
 .int-type { font-size: 1.3rem; }
 
 .intervention-card h4 {
-  font-size: 0.95rem;
-  color: #333;
+  font-size: var(--fs-lg);
+  color: var(--text-strong);
   margin-bottom: 0.3rem;
 }
 
 .intervention-card p {
-  font-size: 0.8rem;
-  color: #666;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
   line-height: 1.4;
 }
 
@@ -340,21 +405,44 @@ function goToDiary() {
 .btn-secondary {
   padding: 0.8rem;
   border: none;
-  border-radius: 25px;
+  border-radius: var(--radius-pill);
   font-size: 1rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: transform var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out),
+              background var(--dur-base) var(--ease-out);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #4a6fa5, #6b8fc5);
-  color: #fff;
+  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+  color: var(--text-on-primary);
   font-weight: 600;
+  box-shadow: var(--glow-primary);
+}
+
+.btn-primary:hover {
+  box-shadow: var(--glow-primary), var(--shadow-float);
+  transform: translateY(-2px);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
 }
 
 .btn-secondary {
-  background: #fff;
-  color: #4a6fa5;
-  border: 1px solid #4a6fa5;
+  background: var(--bg-glass);
+  color: var(--primary);
+  border: 1px solid var(--border-glow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-hover);
+  transform: translateY(-2px);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
 }
 </style>

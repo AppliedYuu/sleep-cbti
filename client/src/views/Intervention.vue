@@ -59,47 +59,88 @@ const tabs = [
 <style scoped>
 .intervention-page {
   min-height: 100vh;
-  background: #f5f7fa;
-  padding-bottom: 20px;
+  /* 与全局 body 一致的静谧夜空背景 */
+  background:
+    radial-gradient(900px 500px at 50% -10%, rgba(138, 180, 248, 0.10), transparent 60%),
+    radial-gradient(700px 420px at 85% 15%, rgba(183, 148, 246, 0.08), transparent 55%),
+    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-base) 60%, #0c1124 100%);
+  padding: 0 1.1rem 3rem;
 }
 
 .page-header {
-  padding: 1.5rem 1.2rem 1rem;
-  background: linear-gradient(135deg, #4a6fa5, #6b8fc5);
-  color: #fff;
+  padding: calc(var(--space-4) + 0.4rem) 0.2rem var(--space-3);
   text-align: center;
+  position: relative;
+}
+
+/* 页眉柔光月晕，呼应 Home 的 hero 氛围 */
+.page-header::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  width: 200px;
+  height: 140px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, var(--primary-glow), transparent 70%);
+  filter: blur(14px);
+  z-index: -1;
 }
 
 .btn-back-link {
   display: inline-block;
-  color: rgba(255,255,255,0.8);
+  color: var(--text-muted);
   text-decoration: none;
-  font-size: 0.85rem;
-  margin-bottom: 0.5rem;
+  font-size: var(--fs-sm);
+  margin-bottom: var(--space-2);
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-pill);
+  background: var(--bg-glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: color var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out);
+}
+
+.btn-back-link:hover {
+  color: var(--primary);
+  border-color: var(--border-glow);
 }
 
 .page-header h1 {
-  font-size: 1.3rem;
+  font-size: var(--fs-xl);
+  background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.3rem;
 }
 
 .page-header p {
-  font-size: 0.8rem;
-  opacity: 0.8;
-  margin-top: 0.2rem;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  margin-top: var(--space-1);
 }
 
+/* ---- Tab 导航：玻璃条 ---- */
 .tab-bar {
   display: flex;
-  background: #fff;
-  padding: 0.4rem 0.4rem;
-  gap: 0;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-pill);
+  padding: 0.35rem;
+  gap: 0.25rem;
   overflow-x: auto;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  box-shadow: var(--shadow-soft);
   position: sticky;
-  top: 0;
+  top: var(--safe-top, 0);
   z-index: 10;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .tab-bar::-webkit-scrollbar { display: none; }
@@ -109,29 +150,76 @@ const tabs = [
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.1rem;
+  gap: 0.12rem;
   flex-shrink: 0;
-  min-width: 56px;
+  min-width: 58px;
   padding: 0.4rem 0.5rem;
-  border: none;
+  border: 1px solid transparent;
   background: transparent;
-  border-radius: 10px;
+  border-radius: var(--radius-pill);
   cursor: pointer;
-  transition: all 0.2s;
-  color: #999;
-  font-size: 0.7rem;
+  transition: background var(--dur-base) var(--ease-out),
+              color var(--dur-base) var(--ease-out),
+              border-color var(--dur-base) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out),
+              transform var(--dur-base) var(--ease-out);
+  color: var(--text-faint);
+  font-size: var(--fs-xs);
+  font-family: inherit;
+}
+
+/* 每个 CBT-I 模块 tab 用对应强调色描边/图标光晕 */
+.tab-btn:nth-child(1) { --tab-accent: var(--primary); }      /* 睡眠限制 */
+.tab-btn:nth-child(2) { --tab-accent: var(--accent-cyan); }  /* 刺激控制 */
+.tab-btn:nth-child(3) { --tab-accent: var(--accent-purple); }/* 认知重塑 */
+.tab-btn:nth-child(4) { --tab-accent: var(--accent-mint); }  /* 放松训练 */
+.tab-btn:nth-child(5) { --tab-accent: var(--accent-amber); } /* 睡眠卫生 */
+.tab-btn:nth-child(6) { --tab-accent: var(--text-muted); }   /* AI助手 */
+
+.tab-btn:active { transform: scale(0.97); }
+
+.tab-btn:hover {
+  color: var(--text-base);
+  background: var(--bg-hover);
 }
 
 .tab-btn.active {
-  background: #e8f0fe;
-  color: #4a6fa5;
+  background: var(--bg-glass-strong);
+  color: var(--tab-accent);
   font-weight: 600;
+  border-color: color-mix(in srgb, var(--tab-accent) 45%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--tab-accent) 22%, transparent);
 }
 
-.tab-icon { font-size: 1.2rem; line-height: 1; }
+.tab-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--tab-accent) 35%, transparent));
+}
+
 .tab-label { white-space: nowrap; line-height: 1; }
 
+/* ---- Tab 内容区 ---- */
 .tab-content {
-  padding: 0.8rem 1.2rem;
+  padding: var(--space-3) 0.1rem 0;
+}
+
+/* 内容错峰入场 */
+.tab-content > * {
+  animation: rise-in var(--dur-slow) var(--ease-out) both;
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab-content > *,
+  .btn-back-link,
+  .tab-btn {
+    animation: none !important;
+    transition-duration: 0.001ms !important;
+  }
 }
 </style>

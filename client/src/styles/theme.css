@@ -1,0 +1,331 @@
+/* =========================================================================
+   睡益良方 · 静谧夜空主题 (Theme: Serene Night Sky)
+   全局设计 Token + 动效 + 玻璃拟态 —— 所有页面统一引用
+   ========================================================================= */
+
+:root {
+  /* ---- 背景层次 (Background layers) ---- */
+  --bg-deep: #0b1020;          /* 最深背景 / 星空 */
+  --bg-base: #0f1426;          /* 页面基础背景 */
+  --bg-elevated: #161d33;      /* 卡片背景 */
+  --bg-soft: #1b2440;          /* 次级面板 / 输入框 */
+  --bg-glass: rgba(27, 36, 64, 0.55); /* 玻璃卡片 */
+  --bg-glass-strong: rgba(22, 29, 51, 0.72); /* 加强玻璃 */
+  --bg-hover: rgba(255, 255, 255, 0.04);
+
+  /* ---- 主色与月光 (Primary & moonlight) ---- */
+  --primary: #8ab4f8;          /* 月光蓝（主交互色） */
+  --primary-strong: #6f9bf0;
+  --primary-weak: rgba(138, 180, 248, 0.15);
+  --primary-glow: rgba(138, 180, 248, 0.35);
+
+  /* ---- 强调色 (Accents) ---- */
+  --accent-mint: #5eead4;      /* 数据正向 / 良好 */
+  --accent-purple: #b794f6;    /* 干预 / 认知 */
+  --accent-amber: #ffd28a;     /* 成就 / 提醒 */
+  --accent-rose: #ff9bb3;      /* 社区 / 温暖 */
+  --accent-cyan: #7dd3fc;      /* 周报 / 趋势 */
+
+  /* ---- 语义色 (Semantic) ---- */
+  --success: #5eead4;
+  --warning: #ffd28a;
+  --danger: #ff8a9b;
+  --info: #8ab4f8;
+
+  /* ---- 文本 (Text) ---- */
+  --text-strong: #eef2ff;      /* 主标题 */
+  --text-base: #c7d0e8;        /* 正文 */
+  --text-muted: #8a93b2;       /* 次要信息 */
+  --text-faint: #59628a;       /* 占位/极弱 */
+  --text-on-primary: #0b1020;
+
+  /* ---- 描边 / 分隔 (Borders) ---- */
+  --border-soft: rgba(255, 255, 255, 0.08);
+  --border-mid: rgba(255, 255, 255, 0.14);
+  --border-glow: rgba(138, 180, 248, 0.30);
+
+  /* ---- 圆角 (Radius) ---- */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  /* ---- 阴影 / 柔光 (Shadow & glow) ---- */
+  --shadow-card: 0 8px 28px rgba(0, 0, 0, 0.35);
+  --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.25);
+  --shadow-float: 0 18px 48px rgba(0, 0, 0, 0.45);
+  --glow-primary: 0 0 24px rgba(138, 180, 248, 0.18);
+  --glow-mint: 0 0 22px rgba(94, 234, 212, 0.22);
+  --glow-purple: 0 0 22px rgba(183, 148, 246, 0.22);
+  --glow-amber: 0 0 22px rgba(255, 210, 138, 0.22);
+
+  /* ---- 间距 (Spacing scale) ---- */
+  --space-1: 0.4rem;
+  --space-2: 0.8rem;
+  --space-3: 1.2rem;
+  --space-4: 1.6rem;
+  --space-5: 2.4rem;
+
+  /* ---- 字体 (Typography) ---- */
+  --font-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-display: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --fs-xs: 0.7rem;
+  --fs-sm: 0.82rem;
+  --fs-md: 0.95rem;
+  --fs-lg: 1.1rem;
+  --fs-xl: 1.5rem;
+  --fs-2xl: 2rem;
+
+  /* ---- 动效 (Motion) ---- */
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 0.18s;
+  --dur-base: 0.28s;
+  --dur-slow: 0.5s;
+
+  /* ---- 页面约束 ---- */
+  --page-max-width: 480px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* =========================================================================
+   全局基础样式
+   ========================================================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  font-family: var(--font-base);
+  background: var(--bg-base);
+  color: var(--text-base);
+  height: 100%;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  touch-action: manipulation;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+}
+
+body {
+  /* 静谧夜空：深邃的蓝紫渐变 + 柔光 */
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(138, 180, 248, 0.10), transparent 60%),
+    radial-gradient(800px 500px at 90% 10%, rgba(183, 148, 246, 0.08), transparent 55%),
+    radial-gradient(700px 480px at 10% 90%, rgba(94, 234, 212, 0.06), transparent 55%),
+    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-base) 55%, #0c1124 100%);
+  background-attachment: fixed;
+  position: relative;
+}
+
+/* =========================================================================
+   星空背景层 (Starfield) —— 固定在 body 之下，柔和呼吸 + 缓慢漂移
+   ========================================================================= */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1.2px 1.2px at 20% 30%, rgba(255, 255, 255, 0.85), transparent),
+    radial-gradient(1px 1px at 40% 70%, rgba(200, 220, 255, 0.7), transparent),
+    radial-gradient(1.4px 1.4px at 70% 20%, rgba(255, 255, 255, 0.75), transparent),
+    radial-gradient(1px 1px at 85% 60%, rgba(180, 200, 255, 0.6), transparent),
+    radial-gradient(1.2px 1.2px at 55% 85%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 10% 50%, rgba(160, 190, 255, 0.55), transparent),
+    radial-gradient(1.3px 1.3px at 90% 90%, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 30% 12%, rgba(200, 220, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 65% 45%, rgba(255, 255, 255, 0.55), transparent),
+    radial-gradient(1px 1px at 5% 78%, rgba(180, 200, 255, 0.45), transparent);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0.55;
+  animation: star-twinkle 6s ease-in-out infinite;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: -20%;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 15% 25%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 75% 75%, rgba(200, 220, 255, 0.45), transparent),
+    radial-gradient(1px 1px at 45% 55%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 88% 35%, rgba(180, 200, 255, 0.35), transparent);
+  background-size: 50% 50%;
+  background-repeat: repeat;
+  opacity: 0.4;
+  animation: star-drift 90s linear infinite;
+}
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 0.7; }
+}
+
+@keyframes star-drift {
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-12%, -8%, 0); }
+}
+
+#app-container {
+  min-height: 100vh;
+  width: 100%;
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+}
+
+/* 选中态 */
+::selection {
+  background: var(--primary-weak);
+  color: var(--text-strong);
+}
+
+/* 滚动条（深色） */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-mid);
+  border-radius: var(--radius-pill);
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* =========================================================================
+   通用文本工具类
+   ========================================================================= */
+.text-muted  { color: var(--text-muted); }
+.text-strong { color: var(--text-strong); }
+.text-mint   { color: var(--accent-mint); }
+.text-amber  { color: var(--accent-amber); }
+.text-rose   { color: var(--accent-rose); }
+.text-cyan   { color: var(--accent-cyan); }
+.text-purple { color: var(--accent-purple); }
+.text-danger { color: var(--danger); }
+
+/* =========================================================================
+   通用玻璃卡片工具类
+   ========================================================================= */
+.glass-card {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-strong {
+  background: var(--bg-glass-strong);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* =========================================================================
+   通用页面布局工具类
+   ========================================================================= */
+.page {
+  min-height: 100vh;
+  padding: 0 1.1rem 3rem;
+}
+.page--center {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.2rem;
+}
+
+/* =========================================================================
+   路由过渡动画
+   ========================================================================= */
+.route-enter-active,
+.route-leave-active {
+  transition: opacity var(--dur-base) var(--ease-out),
+              transform var(--dur-base) var(--ease-out);
+}
+.route-enter-from {
+  opacity: 0;
+  transform: translateY(10px) scale(0.99);
+}
+.route-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.99);
+}
+
+/* =========================================================================
+   通用动画工具类
+   ========================================================================= */
+.animate-float {
+  animation: floaty 5s ease-in-out infinite;
+}
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+.animate-rise {
+  animation: rise-in var(--dur-slow) var(--ease-out) both;
+}
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-pop {
+  animation: pop-in var(--dur-base) var(--ease-spring) both;
+}
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* 内容渐次入场：给子元素 .stagger 自动错峰 */
+.stagger > * {
+  animation: rise-in var(--dur-slow) var(--ease-out) both;
+}
+.stagger > *:nth-child(1) { animation-delay: 0.04s; }
+.stagger > *:nth-child(2) { animation-delay: 0.10s; }
+.stagger > *:nth-child(3) { animation-delay: 0.16s; }
+.stagger > *:nth-child(4) { animation-delay: 0.22s; }
+.stagger > *:nth-child(5) { animation-delay: 0.28s; }
+.stagger > *:nth-child(6) { animation-delay: 0.34s; }
+.stagger > *:nth-child(7) { animation-delay: 0.40s; }
+.stagger > *:nth-child(8) { animation-delay: 0.46s; }
+
+/* =========================================================================
+   无障碍：尊重「减少动态」
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  body::before,
+  body::after { animation: none !important; }
+}

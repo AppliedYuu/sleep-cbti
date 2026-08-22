@@ -5,8 +5,8 @@
       <g v-for="(level, li) in levels" :key="'level-' + li">
         <polygon
           :points="getGridPoints(level)"
-          :fill="li === levels.length - 1 ? 'rgba(74,111,165,0.08)' : 'none'"
-          :stroke="li === levels.length - 1 ? '#4a6fa5' : 'rgba(74,111,165,0.2)'"
+          :fill="li === levels.length - 1 ? 'rgba(138,180,248,0.06)' : 'none'"
+          :stroke="li === levels.length - 1 ? '#8ab4f8' : 'rgba(138,180,248,0.18)'"
           :stroke-width="li === levels.length - 1 ? 1.5 : 0.8"
         />
       </g>
@@ -19,15 +19,15 @@
         :y1="cy"
         :x2="getPoint(i, maxVal).x"
         :y2="getPoint(i, maxVal).y"
-        stroke="rgba(74,111,165,0.15)"
+        stroke="rgba(138,180,248,0.12)"
         stroke-width="0.8"
       />
 
       <!-- 数据区域 -->
       <polygon
         :points="dataPoints"
-        fill="rgba(74,111,165,0.25)"
-        stroke="#4a6fa5"
+        fill="rgba(138,180,248,0.22)"
+        stroke="#8ab4f8"
         stroke-width="2"
         stroke-linejoin="round"
       />
@@ -39,8 +39,8 @@
         :cx="getPoint(i, item.score).x"
         :cy="getPoint(i, item.score).y"
         r="5"
-        fill="#fff"
-        stroke="#4a6fa5"
+        fill="#0f1426"
+        stroke="#8ab4f8"
         stroke-width="2"
       />
 
@@ -153,17 +153,17 @@ svg {
 
 .dim-label {
   font-size: 12px;
-  fill: #555;
+  fill: var(--text-muted);
 }
 
 .dim-name {
   font-weight: 600;
-  fill: #333;
+  fill: var(--text-strong);
 }
 
 .dim-score {
   font-size: 11px;
-  fill: #4a6fa5;
+  fill: var(--primary);
   font-weight: 500;
 }
 </style>

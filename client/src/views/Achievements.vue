@@ -9,10 +9,10 @@
     <div class="progress-card">
       <div class="progress-ring-container">
         <svg width="80" height="80" viewBox="0 0 80 80">
-          <circle cx="40" cy="40" r="34" fill="none" stroke="#eee" stroke-width="5" />
+          <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="5" />
           <circle
             cx="40" cy="40" r="34"
-            fill="none" stroke="#4a6fa5" stroke-width="5"
+            fill="none" stroke="#ffd28a" stroke-width="5"
             :stroke-dasharray="2 * Math.PI * 34"
             :stroke-dashoffset="2 * Math.PI * 34 * (1 - (summary.progress || 0) / 100)"
             stroke-linecap="round"
@@ -104,37 +104,53 @@ watch(userId, (id) => { if (id) loadAchievements(); }, { immediate: true });
 <style scoped>
 .achievements-page {
   min-height: 100vh;
-  background: #f5f7fa;
-  padding-bottom: 30px;
+  /* 静谧夜空背景 */
+  background:
+    radial-gradient(900px 500px at 50% -10%, rgba(138, 180, 248, 0.12), transparent 60%),
+    radial-gradient(700px 420px at 85% 15%, rgba(183, 148, 246, 0.10), transparent 55%),
+    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-base) 60%, #0c1124 100%);
+  background-attachment: fixed;
+  /* 移动端优先：根 padding */
+  padding: 0 1.1rem 3rem;
 }
 
 .page-header {
-  padding: 1.5rem 1.2rem 1rem;
-  background: linear-gradient(135deg, #4a6fa5, #6b8fc5);
-  color: #fff;
+  padding: var(--space-4) 0 var(--space-3);
   text-align: center;
+  position: relative;
 }
 
 .btn-back-link {
   display: inline-block;
-  color: rgba(255,255,255,0.8);
+  color: var(--text-muted);
   text-decoration: none;
-  font-size: 0.85rem;
-  margin-bottom: 0.5rem;
+  font-size: var(--fs-sm);
+  margin-bottom: var(--space-1);
+  transition: color var(--dur-fast) var(--ease-out);
 }
+.btn-back-link:hover { color: var(--primary); }
 
-.page-header h1 { font-size: 1.3rem; }
+.page-header h1 {
+  font-size: var(--fs-xl);
+  background: linear-gradient(135deg, #fff 0%, var(--accent-amber) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
 /* 进度卡片 */
 .progress-card {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin: 0.8rem 1.2rem;
-  padding: 1rem 1.2rem;
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  gap: var(--space-3);
+  margin: var(--space-2) 0;
+  padding: var(--space-3);
+  background: var(--bg-glass);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .progress-ring-container {
@@ -150,25 +166,34 @@ watch(userId, (id) => { if (id) loadAchievements(); }, { immediate: true });
   text-align: center;
 }
 
-.ptc-num { font-size: 1.2rem; font-weight: 700; color: #4a6fa5; }
-.ptc-div { font-size: 0.7rem; color: #999; }
+.ptc-num {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--accent-amber);
+  text-shadow: var(--glow-amber);
+}
+.ptc-div { font-size: var(--fs-xs); color: var(--text-faint); }
 
 .progress-info { flex: 1; }
-.progress-info h3 { font-size: 0.95rem; color: #333; }
-.progress-info p { font-size: 0.8rem; color: #999; margin: 0.2rem 0 0.4rem; }
+.progress-info h3 { font-size: var(--fs-md); color: var(--text-strong); }
+.progress-info p {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  margin: 0.2rem 0 0.4rem;
+}
 
 .progress-bar-small {
-  height: 5px;
-  background: #eee;
-  border-radius: 3px;
+  height: 6px;
+  background: var(--bg-soft);
+  border-radius: var(--radius-pill);
   overflow: hidden;
 }
 
 .pbs-fill {
   height: 100%;
-  background: #4a6fa5;
-  border-radius: 3px;
-  transition: width 0.5s;
+  background: linear-gradient(90deg, var(--accent-amber), var(--primary));
+  border-radius: var(--radius-pill);
+  transition: width var(--dur-slow) var(--ease-out);
 }
 
 /* 徽章网格 */
@@ -176,97 +201,136 @@ watch(userId, (id) => { if (id) loadAchievements(); }, { immediate: true });
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.6rem;
-  padding: 0 1.2rem;
+  padding: 0;
 }
 
 .badge-card {
   padding: 0.8rem 0.5rem;
   text-align: center;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-  transition: all 0.2s;
-  opacity: 0.45;
+  /* 玻璃卡片 */
+  background: var(--bg-glass);
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--text-faint);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform var(--dur-base) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out);
+  /* 锁定/未解锁：去饱和 */
+  opacity: 0.4;
+  filter: grayscale(1);
+  color: var(--text-faint);
 }
 
 .badge-card.unlocked {
   opacity: 1;
+  filter: none;
+  color: inherit;
+  /* 已解锁：暖金光 + 金色左边框 */
+  border-left-color: var(--accent-amber);
+  box-shadow: var(--shadow-card), var(--glow-amber);
+  animation: pop-in var(--dur-base) var(--ease-spring) both;
 }
 
 .badge-card.unlocked:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74,111,165,0.15);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-float), var(--glow-amber);
 }
 
 .badge-icon-wrap {
-  width: 42px;
-  height: 42px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: #f0f5ff;
+  background: var(--bg-soft);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 0.4rem;
-  border: 2px solid #d9e6ff;
+  border: 1px solid var(--border-mid);
+}
+
+.badge-card.unlocked .badge-icon-wrap {
+  background: var(--bg-elevated);
+  border-color: var(--accent-amber);
 }
 
 .badge-icon-wrap.locked {
-  background: #f5f5f5;
-  border-color: #e8e8e8;
+  background: var(--bg-base);
+  border-color: var(--border-soft);
 }
 
-.badge-icon { font-size: 1.4rem; }
+.badge-icon {
+  font-size: 2rem;
+  filter: drop-shadow(0 0 10px var(--glow-amber));
+}
+.badge-icon-wrap.locked .badge-icon {
+  filter: grayscale(1);
+  opacity: 0.6;
+}
 
 .badge-card h4 {
   font-size: 0.78rem;
-  color: #333;
+  color: var(--text-strong);
   margin-bottom: 0.15rem;
 }
 
 .badge-card p {
   font-size: 0.65rem;
-  color: #999;
+  color: var(--text-muted);
   line-height: 1.3;
   margin-bottom: 0.3rem;
 }
 
 .badge-date {
   font-size: 0.62rem;
-  color: #52c41a;
+  color: var(--accent-amber);
   font-weight: 600;
 }
 
 .badge-locked-label {
   font-size: 0.62rem;
-  color: #ccc;
+  color: var(--text-faint);
 }
 
 .refresh-area {
   text-align: center;
-  margin-top: 1.5rem;
+  margin-top: var(--space-4);
 }
 
 .btn-refresh {
   padding: 0.6rem 1.5rem;
-  border: 1px solid #4a6fa5;
-  border-radius: 20px;
-  background: #fff;
-  color: #4a6fa5;
-  font-size: 0.85rem;
+  border: 1px solid var(--accent-amber);
+  border-radius: var(--radius-pill);
+  background: var(--bg-glass);
+  color: var(--accent-amber);
+  font-size: var(--fs-sm);
   cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out);
 }
+.btn-refresh:hover {
+  box-shadow: var(--glow-amber);
+  transform: translateY(-2px);
+}
+.btn-refresh:active { transform: scale(0.97); }
 
 .toast {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: #333;
-  color: #fff;
+  background: rgba(11, 16, 32, 0.92);
+  color: var(--text-strong);
   padding: 0.6rem 1.5rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-mid);
+  font-size: var(--fs-sm);
   z-index: 100;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   animation: fadeInOut 2.5s ease;
 }
 
@@ -275,5 +339,15 @@ watch(userId, (id) => { if (id) loadAchievements(); }, { immediate: true });
   20% { opacity: 1; transform: translateX(-50%) translateY(0); }
   80% { opacity: 1; }
   100% { opacity: 0; }
+}
+
+/* 入场：已解锁徽章逐个弹入（CSS 动画错峰） */
+.badges-grid .badge-card.unlocked:nth-child(3n+1) { animation-delay: 0.04s; }
+.badges-grid .badge-card.unlocked:nth-child(3n+2) { animation-delay: 0.10s; }
+.badges-grid .badge-card.unlocked:nth-child(3n+3) { animation-delay: 0.16s; }
+
+/* 平板及以上：两列更宽松 */
+@media (min-width: 600px) {
+  .badges-grid { grid-template-columns: repeat(4, 1fr); }
 }
 </style>

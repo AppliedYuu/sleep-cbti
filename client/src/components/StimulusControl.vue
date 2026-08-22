@@ -81,22 +81,25 @@ onMounted(loadCard);
 .stimulus-control { position: relative; min-height: 200px; }
 
 .card-main {
-  background: #fff;
-  border-radius: 16px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
   padding: 1.5rem;
   text-align: center;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   position: relative;
   overflow: hidden;
 }
 
 .card-badge {
   display: inline-block;
-  background: #e8f0fe;
-  color: #4a6fa5;
+  background: var(--primary-weak);
+  color: var(--accent-cyan);
   padding: 0.25rem 0.8rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-xs);
   font-weight: 600;
   margin-bottom: 1rem;
 }
@@ -104,14 +107,14 @@ onMounted(loadCard);
 .card-icon-large { font-size: 3.5rem; margin-bottom: 0.5rem; }
 
 .card-main h2 {
-  font-size: 1.3rem;
-  color: #333;
+  font-size: var(--fs-xl);
+  color: var(--text-strong);
   margin-bottom: 0.8rem;
 }
 
 .card-content {
-  font-size: 0.9rem;
-  color: #666;
+  font-size: var(--fs-md);
+  color: var(--text-base);
   line-height: 1.7;
   margin-bottom: 1.2rem;
 }
@@ -120,8 +123,9 @@ onMounted(loadCard);
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
-  background: #f8f9ff;
-  border-radius: 10px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
   padding: 0.8rem;
   margin-bottom: 1.2rem;
   text-align: left;
@@ -129,38 +133,50 @@ onMounted(loadCard);
 
 .challenge-icon { font-size: 1.2rem; flex-shrink: 0; }
 
-.challenge-box p { font-size: 0.85rem; color: #555; line-height: 1.5; }
+.challenge-box p { font-size: var(--fs-sm); color: var(--text-muted); line-height: 1.5; }
 
 .btn-checkin {
   width: 100%;
   padding: 0.8rem;
-  background: linear-gradient(135deg, #4a6fa5, #6b8fc5);
-  color: #fff;
+  background: var(--accent-cyan);
+  color: var(--text-on-primary);
   border: none;
-  border-radius: 25px;
-  font-size: 1rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-lg);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  box-shadow: 0 0 22px rgba(125, 211, 252, 0.35);
+  transition: all var(--dur-base) var(--ease-out);
 }
 
+.btn-checkin:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 28px rgba(125, 211, 252, 0.5);
+}
+
+.btn-checkin:active { transform: scale(0.98); }
+
 .btn-checkin.checked {
-  background: #d9f7be;
-  color: #389e0d;
+  background: var(--primary-weak);
+  color: var(--accent-mint);
+  box-shadow: var(--glow-mint);
   cursor: default;
 }
 
 .btn-checkin:disabled { cursor: default; }
 
 .checkin-history {
-  background: #fff;
-  border-radius: 12px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
   padding: 1rem;
   margin-top: 1rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-.checkin-history h3 { font-size: 0.9rem; color: #333; margin-bottom: 0.8rem; }
+.checkin-history h3 { font-size: var(--fs-md); color: var(--text-strong); margin-bottom: 0.8rem; }
 
 .week-dots {
   display: flex;
@@ -176,21 +192,21 @@ onMounted(loadCard);
 
 .dot-circle { font-size: 1.3rem; }
 
-.dot-circle .done { color: #52c41a; }
+.dot-circle .done { color: var(--accent-mint); }
 
-.week-dot.today .dot-circle { color: #4a6fa5; }
+.week-dot.today .dot-circle { color: var(--accent-cyan); }
 
-.dot-label { font-size: 0.7rem; color: #999; }
+.dot-label { font-size: var(--fs-xs); color: var(--text-muted); }
 
 .toast {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: #52c41a;
-  color: #fff;
+  background: var(--accent-mint);
+  color: var(--text-on-primary);
   padding: 0.6rem 1.5rem;
-  border-radius: 20px;
+  border-radius: var(--radius-pill);
   font-weight: 600;
   z-index: 100;
   animation: fadeInOut 2s ease;

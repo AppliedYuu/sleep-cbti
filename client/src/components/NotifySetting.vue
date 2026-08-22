@@ -77,22 +77,148 @@ defineExpose({ open });
 
 <style scoped>
 .notify-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  position: fixed; inset: 0;
+  background: rgba(11, 16, 32, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: flex; align-items: center; justify-content: center; z-index: 999;
+  animation: notify-fade var(--dur-base) var(--ease-out) both;
 }
+@keyframes notify-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 .notify-card {
-  background: #fff; border-radius: 16px; padding: 1.5rem;
-  width: 300px; text-align: center;
+  background: var(--bg-glass-strong);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-float);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: var(--space-4);
+  width: min(300px, calc(100vw - 2.4rem));
+  text-align: center;
+  animation: notify-rise var(--dur-slow) var(--ease-spring) both;
 }
-.notify-card h3 { font-size: 1.1rem; margin-bottom: 0.3rem; }
-.notify-desc { font-size: 0.82rem; color: #999; margin-bottom: 1rem; }
-.time-picker { display: flex; align-items: center; justify-content: center; gap: 0.4rem; margin-bottom: 1rem; }
-.tp-select { padding: 0.5rem 1rem; font-size: 1.3rem; font-weight: 700; border: 2px solid #ddd; border-radius: 10px; text-align: center; }
-.tp-colon { font-size: 1.5rem; font-weight: 700; }
-.notify-actions { display: flex; flex-direction: column; gap: 0.5rem; }
-.btn-save { padding: 0.6rem; background: #4a6fa5; color: #fff; border: none; border-radius: 10px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
-.btn-cancel { padding: 0.5rem; background: #fff; color: #ff4d4f; border: 1px solid #ff4d4f; border-radius: 10px; font-size: 0.8rem; cursor: pointer; }
-.notify-status { font-size: 0.82rem; color: #52c41a; margin-top: 0.6rem; }
-.notify-msg { font-size: 0.8rem; color: #666; margin-top: 0.4rem; }
-.btn-close { margin-top: 0.8rem; padding: 0.3rem 1.2rem; background: #f0f0f0; border: none; border-radius: 10px; font-size: 0.8rem; color: #999; cursor: pointer; }
+@keyframes notify-rise {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.notify-card h3 {
+  font-size: var(--fs-lg);
+  color: var(--text-strong);
+  margin-bottom: var(--space-1);
+  font-weight: 700;
+}
+.notify-desc {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--space-3);
+}
+
+.time-picker {
+  display: flex; align-items: center; justify-content: center;
+  gap: var(--space-2); margin-bottom: var(--space-3);
+}
+.tp-select {
+  padding: 0.5rem 1rem;
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  background: var(--bg-soft);
+  color: var(--text-strong);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  transition: border-color var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out);
+}
+.tp-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-weak);
+}
+.tp-colon {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: var(--text-base);
+}
+
+.notify-actions {
+  display: flex; flex-direction: column; gap: var(--space-2);
+}
+.btn-save {
+  padding: 0.6rem;
+  background: var(--accent-amber);
+  color: var(--text-on-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--glow-amber);
+  transition: transform var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out);
+}
+.btn-save:hover {
+  box-shadow: 0 0 28px rgba(255, 210, 138, 0.40);
+}
+.btn-save:active {
+  transform: scale(0.98);
+}
+.btn-cancel {
+  padding: 0.5rem;
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out),
+              transform var(--dur-fast) var(--ease-out);
+}
+.btn-cancel:hover {
+  background: rgba(255, 138, 155, 0.10);
+}
+.btn-cancel:active {
+  transform: scale(0.98);
+}
+
+.notify-status {
+  font-size: var(--fs-sm);
+  color: var(--success);
+  margin-top: var(--space-2);
+}
+.notify-msg {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  margin-top: var(--space-1);
+}
+
+.btn-close {
+  margin-top: var(--space-3);
+  padding: 0.3rem 1.2rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out),
+              transform var(--dur-fast) var(--ease-out);
+}
+.btn-close:hover {
+  background: var(--bg-hover);
+  color: var(--text-base);
+}
+.btn-close:active {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notify-overlay,
+  .notify-card { animation: none; }
+}
 </style>

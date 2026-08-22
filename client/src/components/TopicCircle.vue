@@ -138,11 +138,15 @@ onMounted(() => loadPosts());
 <style scoped>
 .topic-circle { min-height: 200px; position: relative; }
 
+/* 发布表单 —— 玻璃卡片 */
 .post-form {
-  background: #fff;
-  border-radius: 14px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
   padding: 1rem 1.2rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   margin-bottom: 1rem;
 }
 
@@ -152,25 +156,34 @@ onMounted(() => loadPosts());
   gap: 0.4rem;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-strong);
   margin-bottom: 0.6rem;
 }
 
 .form-icon { font-size: 1.1rem; }
 
+/* 输入框 —— 软背景 + 月光聚焦 */
 .post-textarea {
   width: 100%;
   padding: 0.6rem 0.8rem;
-  border: 1px solid #e8e8e8;
-  border-radius: 10px;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
   font-size: 0.88rem;
   outline: none;
   resize: vertical;
   font-family: inherit;
-  transition: border-color 0.2s;
+  color: var(--text-strong);
+  background: var(--bg-soft);
+  transition: border-color var(--dur-base) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out);
 }
 
-.post-textarea:focus { border-color: #13c2c2; }
+.post-textarea::placeholder { color: var(--text-faint); }
+
+.post-textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-weak);
+}
 
 .form-footer {
   display: flex;
@@ -179,30 +192,58 @@ onMounted(() => loadPosts());
   margin-top: 0.5rem;
 }
 
-.char-count { font-size: 0.72rem; color: #ccc; }
+.char-count { font-size: 0.72rem; color: var(--text-faint); }
 
+/* 发布按钮 —— 玫瑰强调 + 暖光 */
 .btn-post {
   padding: 0.5rem 1.5rem;
-  background: #13c2c2;
-  color: #fff;
+  background: var(--accent-rose);
+  color: var(--text-on-primary);
   border: none;
-  border-radius: 20px;
+  border-radius: var(--radius-pill);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  box-shadow: 0 0 18px rgba(255, 155, 179, 0.35);
+  transition: transform var(--dur-base) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out),
+              filter var(--dur-base) var(--ease-out);
 }
 
-.btn-post:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-post:hover:not(:disabled) {
+  filter: brightness(1.05);
+  box-shadow: 0 0 24px rgba(255, 155, 179, 0.5);
+}
+
+.btn-post:active:not(:disabled) { transform: scale(0.98); }
+
+.btn-post:disabled { opacity: 0.45; cursor: not-allowed; }
 
 /* 帖子列表 */
-.post-list { display: flex; flex-direction: column; gap: 0.6rem; }
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
 
+/* 帖子卡片 —— 玻璃 + 悬停抬升 + 玫瑰柔光 */
 .post-card {
-  background: #fff;
-  border-radius: 14px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
   padding: 1rem 1.2rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform var(--dur-base) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out),
+              border-color var(--dur-base) var(--ease-out);
+}
+
+.post-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-glow);
+  box-shadow: var(--shadow-float), 0 0 22px rgba(255, 155, 179, 0.18);
 }
 
 .post-header {
@@ -212,13 +253,34 @@ onMounted(() => loadPosts());
   margin-bottom: 0.6rem;
 }
 
-.post-avatar { font-size: 1.2rem; }
-.post-user { font-size: 0.82rem; font-weight: 600; color: #13c2c2; }
-.post-time { font-size: 0.7rem; color: #ccc; margin-left: auto; }
+/* 头像 —— 圆形 + 玫瑰柔光 */
+.post-avatar {
+  font-size: 1.2rem;
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bg-soft);
+  filter: drop-shadow(0 0 8px rgba(255, 155, 179, 0.4));
+}
+
+.post-user {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent-rose);
+}
+
+.post-time {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-left: auto;
+}
 
 .post-content {
   font-size: 0.88rem;
-  color: #444;
+  color: var(--text-base);
   line-height: 1.7;
   margin-bottom: 0.6rem;
   white-space: pre-wrap;
@@ -226,26 +288,31 @@ onMounted(() => loadPosts());
 
 .post-footer { display: flex; justify-content: flex-end; }
 
+/* 点赞按钮 —— 玫瑰浅底胶囊 */
 .btn-like {
   display: flex;
   align-items: center;
   gap: 0.2rem;
   padding: 0.3rem 0.8rem;
-  border: 1px solid #f0f0f0;
-  border-radius: 14px;
-  background: #fafafa;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 155, 179, 0.12);
   font-size: 0.78rem;
   cursor: pointer;
-  color: #999;
-  transition: all 0.2s;
+  color: var(--accent-rose);
+  transition: all var(--dur-base) var(--ease-out);
 }
 
-.btn-like:hover { border-color: #ffccc7; color: #ff4d4f; }
+.btn-like:hover {
+  border-color: var(--accent-rose);
+  background: rgba(255, 155, 179, 0.2);
+}
 
 .btn-like.liked {
-  border-color: #ffccc7;
-  background: #fff1f0;
-  color: #ff4d4f;
+  border-color: var(--accent-rose);
+  background: rgba(255, 155, 179, 0.24);
+  color: var(--accent-rose);
+  box-shadow: 0 0 14px rgba(255, 155, 179, 0.3);
 }
 
 /* 空状态 */
@@ -256,38 +323,49 @@ onMounted(() => loadPosts());
 
 .empty-icon { font-size: 3rem; display: block; margin-bottom: 0.5rem; }
 
-.empty-state p { color: #999; font-size: 0.9rem; }
-.empty-hint { font-size: 0.78rem !important; margin-top: 0.3rem; }
+.empty-state p { color: var(--text-muted); font-size: 0.9rem; }
+.empty-hint { font-size: 0.78rem !important; margin-top: 0.3rem; color: var(--text-faint); }
 
 .load-more { text-align: center; margin-top: 1rem; }
 
 .btn-load-more {
   padding: 0.5rem 1.5rem;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  background: #fff;
-  color: #666;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-pill);
+  background: var(--bg-soft);
+  color: var(--text-muted);
   font-size: 0.85rem;
   cursor: pointer;
+  transition: all var(--dur-base) var(--ease-out);
 }
 
+.btn-load-more:hover {
+  color: var(--text-strong);
+  border-color: var(--border-glow);
+  background: var(--bg-hover);
+}
+
+/* 提示 toast —— 语义色 */
 .toast {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
   padding: 0.6rem 1.2rem;
-  border-radius: 20px;
+  border-radius: var(--radius-pill);
   font-size: 0.85rem;
   font-weight: 600;
   z-index: 100;
   animation: fadeInOut 3s ease;
-  background: #52c41a;
-  color: #fff;
+  background: var(--success);
+  color: var(--text-on-primary);
+  border: 1px solid var(--border-soft);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
-.toast.warn { background: #faad14; color: #fff; }
-.toast.error { background: #ff4d4f; color: #fff; }
+.toast.warn { background: var(--warning); color: var(--text-on-primary); }
+.toast.error { background: var(--danger); color: var(--text-on-primary); }
 
 @keyframes fadeInOut {
   0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
