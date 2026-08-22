@@ -22,8 +22,8 @@ export function getDiaryList(userId, params = {}) {
 }
 
 /**
- * 获取睡眠效率趋势
+ * 获取睡眠效率趋势（最近 N 次提交记录）
  */
-export function getEfficiencyTrend(userId, days = 7) {
-  return request.get(`/diary/${userId}/trend/efficiency`, { params: { days } });
+export function getEfficiencyTrend(userId, count = 7) {
+  return request.get(`/diary/${userId}/trend/efficiency`, { params: { count } });
 }

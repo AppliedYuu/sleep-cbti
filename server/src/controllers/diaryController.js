@@ -113,12 +113,14 @@ async function getDiaryList(req, res) {
 }
 
 /**
- * 获取睡眠效率趋势（最近N天）
+ * 获取睡眠效率趋势（最近 N 次提交记录）
+ * 参数：count（默认 7），兼容旧参数名 days
  */
 async function getEfficiencyTrend(req, res) {
   try {
     const { userId } = req.params;
-    const { days = 7 } = req.query;
+    // 按提交次数而非自然日：LIMIT 取最近 N 条记录
+    const count = parseInt(req.query.count ?? req.query.days ?? 7);
 
     const [rows] = await pool.execute(
       `SELECT diary_date, sleep_efficiency, sleep_latency, daytime_energy
@@ -126,7 +128,7 @@ async function getEfficiencyTrend(req, res) {
        WHERE user_id = ? AND sleep_efficiency IS NOT NULL
        ORDER BY diary_date DESC
        LIMIT ?`,
-      [userId, parseInt(days)]
+      [userId, count]
     );
 
     res.json({

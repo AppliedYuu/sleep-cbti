@@ -15,7 +15,10 @@
 
     <!-- 睡眠效率趋势小卡片 -->
     <div class="trend-card" v-if="trend.length > 0">
-      <h3>📈 近7天睡眠效率趋势</h3>
+      <div class="trend-head">
+        <h3>📈 近 {{ trend.length }} 次睡眠效率趋势</h3>
+        <button class="btn-log" @click="openLog">📋 查看提交日志</button>
+      </div>
       <div class="trend-bars">
         <div
           v-for="(item, idx) in trend"
@@ -34,6 +37,11 @@
           <span class="bar-value">{{ item.sleep_efficiency || '--' }}%</span>
         </div>
       </div>
+    </div>
+
+    <!-- 无记录时提示 -->
+    <div class="trend-empty" v-else>
+      <span>暂无睡眠记录，保存第一条日记后这里会显示近 7 次提交趋势。</span>
     </div>
 
     <!-- 日记表单 -->
@@ -165,12 +173,55 @@
 
     <!-- 保存成功提示 -->
     <div v-if="showSuccess" class="toast-success">✅ 日记保存成功！</div>
+
+    <!-- 提交日志抽屉 -->
+    <Teleport to="body">
+      <Transition name="drawer">
+        <div v-if="logVisible" class="log-overlay" @click.self="logVisible = false">
+          <aside class="log-drawer">
+            <header class="log-header">
+              <h3>📋 提交日志</h3>
+              <button class="log-close" @click="logVisible = false" aria-label="关闭">×</button>
+            </header>
+
+            <div class="log-body">
+              <p v-if="logs.length === 0" class="log-empty">还没有提交记录</p>
+              <ul v-else class="log-list">
+                <li
+                  v-for="(item, idx) in logs"
+                  :key="idx"
+                  class="log-item"
+                  :class="{ current: item.diary_date === diaryDate }"
+                >
+                  <div class="log-main">
+                    <span class="log-date">{{ formatLogDate(item.diary_date) }}</span>
+                    <span class="log-eff" :class="efficiencyClass(item.sleep_efficiency)">
+                      {{ item.sleep_efficiency != null ? item.sleep_efficiency + '%' : '--' }}
+                    </span>
+                  </div>
+                  <div class="log-meta">
+                    <span v-if="item.sleep_latency != null">入睡 {{ item.sleep_latency }} 分钟</span>
+                    <span v-if="item.daytime_energy != null">精力 {{ item.daytime_energy }}/10</span>
+                    <span v-if="item.wake_up_time">起床 {{ item.wake_up_time.slice(0, 5) }}</span>
+                  </div>
+                  <p v-if="item.notes" class="log-notes">{{ item.notes }}</p>
+                </li>
+              </ul>
+            </div>
+
+            <footer class="log-footer">
+              <button class="btn-close-log" @click="logVisible = false">关闭</button>
+            </footer>
+          </aside>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted, watch } from 'vue';
-import { saveDiary, getDiary, getEfficiencyTrend } from '@/api/diary';
+import { saveDiary, getDiary, getDiaryList, getEfficiencyTrend } from '@/api/diary';
 
 import { useAuthStore } from '@/stores/auth';
 const authStore = useAuthStore();
@@ -179,6 +230,11 @@ const diaryDate = ref(todayStr());
 const saving = ref(false);
 const showSuccess = ref(false);
 const trend = ref([]);
+const TREND_COUNT = 7; // 显示最近 N 次提交
+
+// 提交日志
+const logVisible = ref(false);
+const logs = ref([]);
 
 const hours = Array.from({ length: 24 }, (_, i) => i);
 const minutes = [0, 15, 30, 45];
@@ -276,12 +332,34 @@ function resetForm() {
 
 async function loadTrend() {
   try {
-    const res = await getEfficiencyTrend(userId.value, 7);
+    const res = await getEfficiencyTrend(userId.value, TREND_COUNT);
     trend.value = res.data || [];
   } catch {
     trend.value = [];
   }
 }
+
+/* ===================== 提交日志 ===================== */
+
+async function openLog() {
+  logVisible.value = true;
+  try {
+    const res = await getDiaryList(userId.value, { limit: 50 });
+    logs.value = res.data || [];
+  } catch {
+    logs.value = [];
+  }
+}
+
+function formatLogDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('zh-CN', {
+    month: 'long', day: 'numeric', weekday: 'short',
+  });
+}
+
+/* ===================== 保存 ===================== */
 
 async function saveDiaryEntry() {
   saving.value = true;
@@ -400,12 +478,49 @@ onMounted(() => {
   padding: 1rem;
   margin-bottom: 1rem;
 }
-.trend-card h3 {
+.trend-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+  gap: 0.6rem;
+}
+.trend-head h3 {
   font-size: var(--fs-md);
   font-weight: 500;
   color: var(--text-strong);
-  margin-bottom: 0.8rem;
 }
+.btn-log {
+  flex-shrink: 0;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font-size: var(--fs-xs);
+  font-family: inherit;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease),
+              color var(--dur) var(--ease),
+              background var(--dur) var(--ease);
+}
+.btn-log:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-weak);
+}
+
+.trend-empty {
+  background: var(--bg-surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
 .trend-bars {
   display: flex;
   gap: 0.5rem;
@@ -666,6 +781,168 @@ onMounted(() => {
   z-index: 100;
   border-radius: var(--radius-sm);
   opacity: 0.92;
+}
+
+/* ===================== 提交日志抽屉 ===================== */
+.log-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(42, 42, 40, 0.35);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.log-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(360px, 88vw);
+  background: var(--bg-surface);
+  border-left: 1px solid var(--bg-line);
+  box-shadow: var(--shadow-float);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid var(--bg-line);
+}
+.log-header h3 {
+  font-size: var(--fs-lg);
+  color: var(--text-strong);
+}
+.log-close {
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: var(--bg-sunken);
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.log-close:hover {
+  background: var(--bg-hover);
+  color: var(--text-strong);
+}
+
+.log-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.8rem 1.2rem;
+}
+.log-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  padding: 2rem 0;
+}
+.log-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.log-item {
+  padding: 0.7rem 0.9rem;
+  background: var(--bg-sunken);
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid transparent;
+  border-radius: var(--radius-sm);
+}
+.log-item.current {
+  border-left-color: var(--primary);
+  background: var(--bg-surface);
+}
+.log-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.3rem;
+}
+.log-date {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-strong);
+}
+.log-eff {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+.log-eff.good { color: var(--primary); }
+.log-eff.fair { color: var(--accent-clay); }
+.log-eff.warn { color: var(--accent-clay); }
+.log-eff.bad { color: var(--text-muted); }
+.log-meta {
+  display: flex;
+  gap: 0.8rem;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+.log-notes {
+  margin-top: 0.3rem;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.log-footer {
+  padding: 0.9rem 1.2rem calc(0.9rem + var(--safe-bottom));
+  border-top: 1px solid var(--bg-line);
+  background: var(--bg-surface);
+}
+.btn-close-log {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--primary);
+  color: var(--text-on-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease);
+}
+.btn-close-log:hover { background: var(--primary-strong); }
+
+/* 抽屉过渡 */
+.drawer-enter-active,
+.drawer-leave-active {
+  transition: opacity 220ms var(--ease);
+}
+.drawer-enter-active .log-drawer,
+.drawer-leave-active .log-drawer {
+  transition: transform 220ms var(--ease);
+}
+.drawer-enter-from,
+.drawer-leave-to {
+  opacity: 0;
+}
+.drawer-enter-from .log-drawer,
+.drawer-leave-to .log-drawer {
+  transform: translateX(100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer-enter-active,
+  .drawer-leave-active,
+  .drawer-enter-active .log-drawer,
+  .drawer-leave-active .log-drawer {
+    transition: none;
+  }
 }
 
 @keyframes fadeInOut {
