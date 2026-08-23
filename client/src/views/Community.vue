@@ -106,7 +106,6 @@ const activeTab = ref('camp');
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  backdrop-filter: none;
   box-shadow: none;
 }
 

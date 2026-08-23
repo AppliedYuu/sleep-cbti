@@ -238,9 +238,7 @@ function handleSubmit() {
 
 .q-header {
   padding: var(--space-3);
-  background: linear-gradient(135deg, var(--bg-glass-strong), rgba(138, 180, 248, 0.12));
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--bg-surface);
   border-bottom: 1px solid var(--border-soft);
   color: var(--text-strong);
   position: sticky;
@@ -249,16 +247,17 @@ function handleSubmit() {
 }
 
 .btn-back {
-  background: var(--bg-glass);
-  border: 1px solid var(--border-soft);
+  background: transparent;
+  border: 1px solid var(--border-mid);
   color: var(--text-base);
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
   font-size: var(--fs-sm);
+  font-family: inherit;
   cursor: pointer;
   margin-bottom: var(--space-2);
-  transition: background var(--dur-base) var(--ease-out),
-              border-color var(--dur-base) var(--ease-out);
+  transition: border-color var(--dur-base) var(--ease-out),
+              color var(--dur-base) var(--ease-out);
 }
 
 .btn-back:hover {
@@ -288,18 +287,16 @@ function handleSubmit() {
 .progress-bar {
   flex: 1;
   height: 6px;
-  background: var(--bg-soft);
+  background: var(--bg-line);
   border-radius: var(--radius-pill);
   overflow: hidden;
-  border: 1px solid var(--border-soft);
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--accent-mint));
+  background: var(--primary);
   border-radius: var(--radius-pill);
   transition: width var(--dur-base) var(--ease-out);
-  box-shadow: var(--glow-primary);
 }
 
 .progress-text {
@@ -315,21 +312,18 @@ function handleSubmit() {
 .question-card {
   padding: var(--space-3);
   margin-bottom: var(--space-2);
-  background: var(--bg-glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--bg-surface);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
   transition: border-color var(--dur-base) var(--ease-out),
-              box-shadow var(--dur-base) var(--ease-out),
-              transform var(--dur-base) var(--ease-out);
-  border-left: 2px solid transparent;
+              box-shadow var(--dur-base) var(--ease-out);
+  border-left: 3px solid transparent;
 }
 
 .question-card.active {
   border-color: var(--border-glow);
-  box-shadow: var(--shadow-card), var(--glow-primary);
+  box-shadow: var(--shadow-card), var(--focus-ring);
 }
 
 .question-card.answered {
@@ -338,10 +332,9 @@ function handleSubmit() {
 
 .q-section-label {
   font-size: var(--fs-xs);
-  color: var(--primary);
-  font-weight: 700;
+  color: var(--primary-strong);
+  font-weight: 600;
   margin-bottom: var(--space-1);
-  text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
@@ -376,18 +369,20 @@ function handleSubmit() {
   border: 1px solid var(--border-mid);
   border-radius: var(--radius-sm);
   font-size: var(--fs-md);
-  background: var(--bg-soft);
+  font-family: inherit;
+  background: var(--bg-sunken);
   color: var(--text-base);
   outline: none;
   transition: border-color var(--dur-base) var(--ease-out),
               box-shadow var(--dur-base) var(--ease-out);
-  width: 180px;
+  width: 100%;
+  max-width: 220px;
 }
 
 .input-time:focus,
 .input-number:focus {
   border-color: var(--primary);
-  box-shadow: var(--glow-primary);
+  box-shadow: var(--focus-ring);
 }
 
 .input-hint,
@@ -410,29 +405,25 @@ function handleSubmit() {
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--border-mid);
   border-radius: var(--radius-pill);
-  background: var(--bg-soft);
+  background: var(--bg-sunken);
   color: var(--text-base);
   font-size: var(--fs-sm);
+  font-family: inherit;
   cursor: pointer;
-  transition: all var(--dur-base) var(--ease-out);
+  transition: border-color var(--dur-base) var(--ease-out),
+              background var(--dur-base) var(--ease-out),
+              color var(--dur-base) var(--ease-out);
 }
 
 .btn-scale:hover {
-  transform: translateY(-2px);
-  border-color: var(--border-glow);
-  box-shadow: var(--shadow-soft);
-}
-
-.btn-scale:active {
-  transform: scale(0.98);
+  border-color: var(--primary);
 }
 
 .btn-scale.selected {
   background: var(--primary);
   border-color: var(--primary);
   color: var(--text-on-primary);
-  font-weight: 600;
-  box-shadow: var(--glow-primary);
+  font-weight: 500;
 }
 
 .scale-dot {
@@ -442,10 +433,11 @@ function handleSubmit() {
   display: inline-block;
 }
 
-.scale-dot.level-0 { background: var(--success); }
-.scale-dot.level-1 { background: var(--accent-mint); }
-.scale-dot.level-2 { background: var(--warning); }
-.scale-dot.level-3 { background: var(--danger); }
+/* 低分=好 → 高分=差：薄荷 → 鼠尾草 → 琥珀 → 陶土 的低饱和渐变 */
+.scale-dot.level-0 { background: var(--accent-mint); }
+.scale-dot.level-1 { background: var(--primary); }
+.scale-dot.level-2 { background: var(--accent-amber); }
+.scale-dot.level-3 { background: var(--accent-clay); }
 
 /* 滑块 */
 .q-scale-slider,
@@ -460,7 +452,7 @@ function handleSubmit() {
 }
 
 .sl-label {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-sm);
   color: var(--text-faint);
   text-align: center;
   flex: 1;
@@ -468,7 +460,7 @@ function handleSubmit() {
 }
 
 .sl-label.active {
-  color: var(--primary);
+  color: var(--primary-strong);
   font-weight: 600;
 }
 
@@ -486,42 +478,34 @@ function handleSubmit() {
   appearance: none;
   height: 6px;
   border-radius: var(--radius-pill);
-  background: linear-gradient(to right, var(--success), var(--warning), var(--danger));
+  background: var(--bg-line);
   outline: none;
-  border: 1px solid var(--border-soft);
 }
 
 .range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: var(--primary);
-  border: 2px solid var(--bg-elevated);
-  box-shadow: var(--glow-primary);
+  border: 2px solid var(--bg-surface);
   cursor: pointer;
-  transition: transform var(--dur-base) var(--ease-out);
-}
-
-.range-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
 }
 
 .range-slider::-moz-range-thumb {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: var(--primary);
-  border: 2px solid var(--bg-elevated);
-  box-shadow: var(--glow-primary);
+  border: 2px solid var(--bg-surface);
   cursor: pointer;
 }
 
 .slider-value {
   margin-top: var(--space-1);
   font-size: var(--fs-sm);
-  color: var(--primary);
+  color: var(--primary-strong);
   text-align: center;
 }
 
@@ -530,7 +514,7 @@ function handleSubmit() {
   font-style: italic;
 }
 
-/* Footer */
+/* Footer：实体纸面底栏 */
 .q-footer {
   position: fixed;
   bottom: 0;
@@ -542,11 +526,10 @@ function handleSubmit() {
   justify-content: center;
   gap: var(--space-3);
   padding: var(--space-3);
-  background: var(--bg-glass-strong);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  padding-bottom: calc(var(--space-3) + var(--safe-bottom));
+  background: var(--bg-surface);
   border-top: 1px solid var(--border-soft);
-  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-soft);
   z-index: 10;
 }
 
@@ -555,16 +538,15 @@ function handleSubmit() {
   border: none;
   border-radius: var(--radius-pill);
   font-size: var(--fs-md);
+  font-family: inherit;
   cursor: pointer;
-  transition: all var(--dur-base) var(--ease-out);
-}
-
-.btn-nav:active {
-  transform: scale(0.98);
+  transition: background var(--dur-base) var(--ease-out),
+              color var(--dur-base) var(--ease-out),
+              border-color var(--dur-base) var(--ease-out);
 }
 
 .btn-prev {
-  background: var(--bg-soft);
+  background: var(--bg-sunken);
   color: var(--text-muted);
   border: 1px solid var(--border-mid);
 }
@@ -577,7 +559,6 @@ function handleSubmit() {
 .btn-next {
   background: var(--primary);
   color: var(--text-on-primary);
-  box-shadow: var(--glow-primary);
 }
 
 .btn-next:hover {
@@ -587,9 +568,8 @@ function handleSubmit() {
 .btn-submit {
   background: var(--primary);
   color: var(--text-on-primary);
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.05em;
-  box-shadow: var(--glow-primary);
 }
 
 .btn-submit:hover {

@@ -1,9 +1,8 @@
 <template>
   <div class="sleep-hygiene">
-    <div class="day-indicator">📅 {{ todayStr }}</div>
+    <div class="day-indicator">{{ todayStr }}</div>
 
     <div class="points-summary" v-if="totalPoints > 0">
-      <span class="pts-icon">⭐</span>
       <span class="pts-value">{{ totalPoints }} 分</span>
       <span class="pts-label">今日已获积分</span>
     </div>
@@ -25,9 +24,7 @@
         </div>
         <div class="task-right">
           <span class="task-points">+{{ task.points }}</span>
-          <span class="task-check" :class="{ done: task.isCompleted }">
-            {{ task.isCompleted ? '✅' : '○' }}
-          </span>
+          <span class="task-check" :class="{ done: task.isCompleted }" aria-hidden="true"></span>
         </div>
       </div>
     </div>
@@ -104,41 +101,38 @@ onMounted(loadTasks);
   margin-bottom: 1rem;
 }
 
-.pts-icon { font-size: 1.2rem; }
-.pts-value { font-size: var(--fs-xl); font-weight: 700; color: var(--accent-amber); }
+.pts-value { font-family: var(--font-serif); font-size: var(--fs-xl); font-weight: 500; color: var(--accent-clay); }
 .pts-label { font-size: var(--fs-xs); color: var(--text-muted); }
 
 .task-list { display: flex; flex-direction: column; gap: 0.5rem; }
 
+/* 实体纸卡任务行 */
 .task-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.8rem 1rem;
-  background: var(--bg-glass);
+  background: var(--bg-surface);
   border: 1px solid var(--border-soft);
-  border-bottom: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   cursor: pointer;
-  transition: all var(--dur-base) var(--ease-out);
+  transition: border-color var(--dur-base) var(--ease-out),
+              background var(--dur-base) var(--ease-out);
 }
 
 .task-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-float);
   border-color: var(--border-mid);
 }
 
-.task-card:active { transform: scale(0.98); }
-
 .task-card.completed {
-  opacity: 0.85;
-  background: var(--bg-glass-strong);
-  border-color: var(--border-glow);
-  box-shadow: var(--glow-amber);
+  background: var(--primary-weak);
+  border-color: rgba(124, 152, 133, 0.35);
+}
+
+.task-card.completed .task-info h4 {
+  text-decoration: line-through;
+  color: var(--text-muted);
 }
 
 .task-left {
@@ -175,24 +169,32 @@ onMounted(loadTasks);
 }
 
 .task-check {
-  font-size: 1.3rem;
-  color: var(--text-faint);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-mid);
+  background: transparent;
+  flex-shrink: 0;
 }
 
-.task-check.done { color: var(--accent-amber); }
+.task-check.done {
+  border-color: var(--primary);
+  background: var(--primary);
+}
 
 .empty { text-align: center; color: var(--text-muted); padding: 2rem; }
 
+/* Toast：全站统一深墨底 */
 .toast {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--accent-amber);
-  color: var(--text-on-primary);
+  background: var(--text-strong);
+  color: var(--bg-base);
   padding: 0.6rem 1.5rem;
-  border-radius: var(--radius-pill);
-  font-weight: 600;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
   z-index: 100;
   animation: fadeInOut 2s ease;
   white-space: nowrap;

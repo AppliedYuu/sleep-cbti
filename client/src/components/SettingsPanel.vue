@@ -18,7 +18,7 @@
 
             <!-- 背景色（可折叠） -->
             <section class="sd-group" :class="{ open: bgExpanded }">
-              <button class="sd-head" @click="bgExpanded = !bgExpanded" aria-expanded="bgExpanded">
+              <button class="sd-head" @click="bgExpanded = !bgExpanded" :aria-expanded="bgExpanded">
                 <span class="sd-head-left">
                   <span class="sd-arrow" aria-hidden="true">▸</span>
                   <span class="sd-group-name">背景色</span>
@@ -39,7 +39,7 @@
 
             <!-- 字体颜色（可折叠） -->
             <section class="sd-group" :class="{ open: textExpanded }">
-              <button class="sd-head" @click="textExpanded = !textExpanded" aria-expanded="textExpanded">
+              <button class="sd-head" @click="textExpanded = !textExpanded" :aria-expanded="textExpanded">
                 <span class="sd-head-left">
                   <span class="sd-arrow" aria-hidden="true">▸</span>
                   <span class="sd-group-name">字体颜色</span>
@@ -151,7 +151,7 @@ async function saveSettings() {
   }
 }
 
-/** 重置为默认（米色背景 + 黑色字体），应用并保存 */
+/** 重置为默认（奶白纸底 + 浓墨字，与 theme.css 一致），应用并保存 */
 function handleReset() {
   bgColor.value = DEFAULT_THEME.bgColor;
   textColor.value = DEFAULT_THEME.textColor;
@@ -181,8 +181,6 @@ defineExpose({ open });
   inset: 0;
   z-index: 900;
   background: rgba(42, 42, 40, 0.35);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
 }
 
 /* ---- 抽屉 ---- */

@@ -12,7 +12,7 @@
         <div class="ex-info">
           <h4>{{ ex.title }}</h4>
           <p>{{ ex.description }}</p>
-          <span class="ex-duration">⏱️ {{ formatDuration(ex.duration) }}</span>
+          <span class="ex-duration">{{ formatDuration(ex.duration) }}</span>
         </div>
         <span class="ex-arrow">→</span>
       </div>
@@ -34,15 +34,15 @@
           </div>
           <div class="timer-controls">
             <button class="btn-timer" @click="toggleTimer">
-              {{ isPlaying ? '⏸️ 暂停' : '▶️ 开始' }}
+              {{ isPlaying ? '暂停' : '开始' }}
             </button>
-            <button class="btn-timer btn-reset" @click="resetTimer">🔄 重置</button>
+            <button class="btn-timer btn-reset" @click="resetTimer">重置</button>
           </div>
         </div>
 
         <!-- 定时关闭设置 -->
         <div class="auto-stop" v-if="isPlaying">
-          <label>🔔 定时关闭（分钟后）：</label>
+          <label>定时关闭（分钟后）</label>
           <div class="auto-stop-options">
             <button
               v-for="min in [5, 10, 15, 20, 30]"
@@ -94,7 +94,7 @@
       </div>
     </div>
 
-    <div v-if="showAutoStopToast" class="toast">⏰ 定时关闭已触发，播放已停止</div>
+    <div v-if="showAutoStopToast" class="toast">定时关闭已触发，播放已停止</div>
   </div>
 </template>
 
@@ -111,8 +111,11 @@ const timerRemaining = ref(0);
 const autoStopMinutes = ref(0);
 const showAutoStopToast = ref(false);
 
+// 所有计时句柄统一放外层，确保卸载时可清理
 let timerInterval = null;
 let autoStopTimeout = null;
+let breathInterval = null;
+let mindInterval = null;
 
 // Breathing state
 const breathPhase = ref('inhale');
@@ -195,10 +198,14 @@ function startTimer() {
 function pauseTimer() {
   isPlaying.value = false;
   clearInterval(timerInterval);
+  clearInterval(breathInterval);
+  clearInterval(mindInterval);
 }
 
 function resetTimer() {
   clearInterval(timerInterval);
+  clearInterval(breathInterval);
+  clearInterval(mindInterval);
   isPlaying.value = false;
   timerRemaining.value = activeExercise.value?.duration || 300;
   breathCount.value = 1;
@@ -209,6 +216,8 @@ function resetTimer() {
 
 function stopExercise() {
   clearInterval(timerInterval);
+  clearInterval(breathInterval);
+  clearInterval(mindInterval);
   clearTimeout(autoStopTimeout);
   isPlaying.value = false;
   activeExercise.value = null;
@@ -221,6 +230,8 @@ function setAutoStop(min) {
   autoStopTimeout = setTimeout(() => {
     isPlaying.value = false;
     clearInterval(timerInterval);
+    clearInterval(breathInterval);
+    clearInterval(mindInterval);
     showAutoStopToast.value = true;
     setTimeout(() => { showAutoStopToast.value = false; }, 3000);
     autoStopMinutes.value = 0;
@@ -228,8 +239,6 @@ function setAutoStop(min) {
 }
 
 // 呼吸引导
-let breathInterval = null;
-
 function startBreathingCycle() {
   clearInterval(breathInterval);
   let phaseSec = 0;
@@ -278,7 +287,8 @@ function startMindfulnessScript() {
   currentMindfulnessStep.value = steps[0];
   mindfulnessProgress.value = 0;
 
-  const mindInterval = setInterval(() => {
+  clearInterval(mindInterval);
+  mindInterval = setInterval(() => {
     stepIdx++;
     if (stepIdx < steps.length) {
       currentMindfulnessStep.value = steps[stepIdx];
@@ -287,16 +297,13 @@ function startMindfulnessScript() {
       clearInterval(mindInterval);
     }
   }, stepDuration * 1000);
-
-  // Clean up on unmount
-  const originalMindInterval = mindInterval;
-  onUnmounted(() => clearInterval(originalMindInterval));
 }
 
 watch(() => activeExercise.value, (newVal) => {
   if (!newVal) {
     clearInterval(breathInterval);
     clearInterval(timerInterval);
+    clearInterval(mindInterval);
   }
 });
 
@@ -304,6 +311,7 @@ onMounted(loadList);
 onUnmounted(() => {
   clearInterval(timerInterval);
   clearInterval(breathInterval);
+  clearInterval(mindInterval);
   clearTimeout(autoStopTimeout);
 });
 </script>
@@ -313,55 +321,51 @@ onUnmounted(() => {
 
 .exercise-list { display: flex; flex-direction: column; gap: var(--space-2); }
 
+/* 实体纸卡：无玻璃、无发光、无位移弹跳 */
 .exercise-card {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   padding: 1rem 1.2rem;
-  background: var(--bg-glass);
+  background: var(--bg-surface);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   box-shadow: var(--shadow-card);
   cursor: pointer;
-  transition: transform var(--dur-base) var(--ease-out),
-              box-shadow var(--dur-base) var(--ease-out),
-              border-color var(--dur-base) var(--ease-out);
+  transition: box-shadow var(--dur) var(--ease),
+              border-color var(--dur) var(--ease);
 }
 
 .exercise-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-float), var(--glow-mint);
-  border-color: var(--border-glow);
+  box-shadow: var(--shadow-float);
+  border-color: var(--border-mid);
 }
 .ex-icon { font-size: 2rem; flex-shrink: 0; }
 
 .ex-info { flex: 1; }
 .ex-info h4 { font-size: var(--fs-md); color: var(--text-strong); margin-bottom: 0.2rem; }
 .ex-info p { font-size: var(--fs-xs); color: var(--text-muted); line-height: 1.4; margin-bottom: 0.3rem; }
-.ex-duration { font-size: var(--fs-xs); color: var(--accent-mint); font-weight: 600; }
+.ex-duration { font-size: var(--fs-xs); color: var(--primary-strong); font-weight: 500; }
 .ex-arrow { font-size: 1.2rem; color: var(--text-faint); }
 
 .btn-back-player {
   display: block;
   background: none;
   border: none;
-  color: var(--accent-mint);
+  color: var(--primary-strong);
   font-size: var(--fs-sm);
+  font-family: inherit;
   cursor: pointer;
   padding: 0;
   margin-bottom: var(--space-2);
   transition: opacity var(--dur-fast) var(--ease-out);
 }
-.btn-back-player:hover { opacity: 0.8; }
+.btn-back-player:hover { opacity: 0.75; }
 
 .player-card {
-  background: var(--bg-glass);
+  background: var(--bg-surface);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-lg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   padding: 1.5rem;
   text-align: center;
   box-shadow: var(--shadow-card);
@@ -375,18 +379,19 @@ onUnmounted(() => {
 
 .timer-section { margin-bottom: var(--space-3); }
 
+/* 衬线大数字计时器，运行态换主色、无发光 */
 .timer-display {
+  font-family: var(--font-serif);
   font-size: 3rem;
-  font-weight: 700;
-  font-family: 'Courier New', monospace;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
   color: var(--text-faint);
   margin-bottom: 0.6rem;
-  transition: color var(--dur-base) var(--ease-out), text-shadow var(--dur-base) var(--ease-out);
+  transition: color var(--dur) var(--ease);
 }
 
 .timer-display.running {
-  color: var(--accent-mint);
-  text-shadow: var(--glow-mint);
+  color: var(--primary-strong);
 }
 
 .timer-controls {
@@ -397,26 +402,24 @@ onUnmounted(() => {
 
 .btn-timer {
   padding: 0.6rem 1.5rem;
-  border: 1px solid var(--accent-mint);
+  border: 1px solid var(--primary);
   border-radius: var(--radius-pill);
-  background: var(--accent-mint);
-  color: #052e2b;
+  background: var(--primary);
+  color: var(--text-on-primary);
   font-size: var(--fs-md);
-  font-weight: 600;
+  font-weight: 500;
+  font-family: inherit;
   cursor: pointer;
-  box-shadow: var(--glow-mint);
-  transition: transform var(--dur-fast) var(--ease-out),
-              filter var(--dur-fast) var(--ease-out);
+  transition: background var(--dur) var(--ease);
 }
-.btn-timer:hover { filter: brightness(1.08); }
-.btn-timer:active { transform: scale(0.98); }
+.btn-timer:hover { background: var(--primary-strong); }
 
 .btn-reset {
   border-color: var(--border-mid);
   color: var(--text-muted);
-  background: var(--bg-soft);
-  box-shadow: none;
+  background: transparent;
 }
+.btn-reset:hover { background: var(--bg-surface); border-color: var(--primary); color: var(--primary-strong); }
 
 .auto-stop { margin-bottom: var(--space-3); text-align: left; }
 
@@ -428,29 +431,31 @@ onUnmounted(() => {
   padding: 0.35rem 0.7rem;
   border: 1px solid var(--border-mid);
   border-radius: var(--radius-sm);
-  background: var(--bg-soft);
+  background: transparent;
   color: var(--text-muted);
   font-size: var(--fs-xs);
+  font-family: inherit;
   cursor: pointer;
-  transition: all var(--dur-fast) var(--ease-out);
+  transition: border-color var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out),
+              background var(--dur-fast) var(--ease-out);
 }
 
-.btn-auto-stop:hover { border-color: var(--border-glow); color: var(--text-base); }
+.btn-auto-stop:hover { border-color: var(--primary); color: var(--primary-strong); }
 
 .btn-auto-stop.selected {
-  background: var(--accent-mint);
-  color: #052e2b;
-  border-color: var(--accent-mint);
-  box-shadow: var(--glow-mint);
+  background: var(--primary-weak);
+  color: var(--primary-strong);
+  border-color: var(--primary);
 }
 
 .auto-stop-info {
   font-size: var(--fs-xs);
-  color: var(--accent-mint);
+  color: var(--primary-strong);
   margin-top: 0.4rem;
 }
 
-/* 呼吸引导 */
+/* 呼吸引导：纯色描边圆 + 缩放，无渐变无光晕 */
 .breathing-guide { margin: var(--space-2) 0; }
 
 .breath-circle {
@@ -461,30 +466,30 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid rgba(94, 234, 212, 0.45);
+  border: 2px solid rgba(127, 179, 166, 0.45);
+  background: rgba(127, 179, 166, 0.10);
   transition: transform var(--dur-slow) var(--ease-out),
               background var(--dur-slow) var(--ease-out),
-              box-shadow var(--dur-slow) var(--ease-out);
-  background: radial-gradient(circle at center, rgba(94, 234, 212, 0.10), rgba(94, 234, 212, 0.02) 70%, transparent);
+              border-color var(--dur-slow) var(--ease-out);
 }
 
 .breath-circle.inhale {
   transform: scale(1.3);
-  background: radial-gradient(circle at center, rgba(94, 234, 212, 0.28), rgba(94, 234, 212, 0.08) 70%, transparent);
-  box-shadow: var(--glow-mint), 0 0 40px rgba(94, 234, 212, 0.18) inset;
+  background: rgba(127, 179, 166, 0.22);
+  border-color: rgba(127, 179, 166, 0.70);
 }
 .breath-circle.hold {
   transform: scale(1.3);
-  background: radial-gradient(circle at center, rgba(94, 234, 212, 0.20), rgba(94, 234, 212, 0.06) 70%, transparent);
-  box-shadow: var(--glow-mint);
+  background: rgba(127, 179, 166, 0.16);
+  border-color: rgba(127, 179, 166, 0.55);
 }
 .breath-circle.exhale {
   transform: scale(1);
-  background: radial-gradient(circle at center, rgba(94, 234, 212, 0.10), rgba(94, 234, 212, 0.02) 70%, transparent);
-  box-shadow: none;
+  background: rgba(127, 179, 166, 0.10);
+  border-color: rgba(127, 179, 166, 0.45);
 }
 
-.breath-text { font-size: var(--fs-md); color: var(--accent-mint); font-weight: 600; }
+.breath-text { font-size: var(--fs-md); color: var(--primary-strong); font-weight: 500; }
 .breath-counter { font-size: var(--fs-sm); color: var(--text-muted); }
 
 /* PMR */
@@ -492,7 +497,7 @@ onUnmounted(() => {
 
 .pmr-current { margin-bottom: var(--space-2); }
 
-.pmr-index { display: inline-block; background: var(--primary-weak); color: var(--accent-mint); padding: 0.2rem 0.6rem; border-radius: var(--radius-sm); font-size: var(--fs-xs); margin-bottom: 0.4rem; }
+.pmr-index { display: inline-block; background: var(--primary-weak); color: var(--primary-strong); padding: 0.2rem 0.6rem; border-radius: var(--radius-sm); font-size: var(--fs-xs); margin-bottom: 0.4rem; }
 
 .pmr-instruction { font-size: var(--fs-sm); color: var(--text-base); line-height: 1.5; }
 
@@ -506,21 +511,22 @@ onUnmounted(() => {
   transition: background var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
 }
 
-.pmr-dot.done { background: var(--success); }
-.pmr-dot.current { background: var(--accent-mint); transform: scale(1.3); box-shadow: var(--glow-mint); }
+.pmr-dot.done { background: var(--accent-mint); }
+.pmr-dot.current { background: var(--primary-strong); transform: scale(1.3); }
 
 .btn-next-muscle {
   padding: 0.4rem 1rem;
-  border: 1px solid var(--accent-mint);
+  border: 1px solid var(--primary);
   border-radius: var(--radius-sm);
-  background: var(--bg-soft);
-  color: var(--accent-mint);
+  background: transparent;
+  color: var(--primary-strong);
   font-size: var(--fs-sm);
+  font-family: inherit;
   cursor: pointer;
-  transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  transition: background var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out);
 }
-.btn-next-muscle:hover { border-color: var(--border-glow); }
-.btn-next-muscle:active { transform: scale(0.98); }
+.btn-next-muscle:hover { background: var(--primary-weak); }
 
 /* 正念冥想 */
 .mindfulness-guide { margin: var(--space-2) 0; }
@@ -535,34 +541,30 @@ onUnmounted(() => {
 .mindfulness-progress { margin-top: var(--space-2); }
 
 .mp-bar {
-  height: 4px;
-  background: var(--bg-soft);
+  height: 6px;
+  background: var(--bg-line);
   border-radius: var(--radius-pill);
   overflow: hidden;
 }
 
 .mp-fill {
   height: 100%;
-  background: var(--accent-mint);
+  background: var(--primary);
   border-radius: var(--radius-pill);
-  box-shadow: var(--glow-mint);
   transition: width var(--dur-slow) var(--ease-out);
 }
 
+/* Toast：与全站统一的深墨底 */
 .toast {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--bg-glass-strong);
-  border: 1px solid var(--border-mid);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  color: var(--text-strong);
+  background: var(--text-strong);
+  color: var(--bg-base);
   padding: 0.6rem 1.5rem;
-  border-radius: var(--radius-pill);
-  font-weight: 600;
-  box-shadow: var(--shadow-float);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
   z-index: 100;
   animation: fadeInOut 3s ease;
 }

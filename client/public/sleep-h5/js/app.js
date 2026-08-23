@@ -350,7 +350,7 @@ function initStars() {
       s.alpha = Math.max(0.2, Math.min(1, s.alpha));
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(200,210,255,${s.alpha})`;
+      ctx.fillStyle = `rgba(124,100,60,${s.alpha * 0.35})`;
       ctx.fill();
       // 偶尔闪烁
       if (Math.random() < 0.002) s.alpha = 1;
@@ -572,7 +572,7 @@ function updateRadarChart() {
 
   const axes = ['consequences', 'worry', 'expectations', 'medication'];
   const labels = ['后果夸大', '失控担忧', '僵化期望', '药物依赖'];
-  const colors = ['#f7a641', '#e0556a', '#a78bfa', '#4ec9e0'];
+  const colors = ['#D9A441', '#C97B5A', '#9A8BB4', '#6FA3B0'];
 
   ctx.clearRect(0, 0, w, h);
 
@@ -587,7 +587,7 @@ function updateRadarChart() {
       i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
     }
     ctx.closePath();
-    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.strokeStyle = 'rgba(42,42,40,0.12)';
     ctx.stroke();
   }
 
@@ -597,7 +597,7 @@ function updateRadarChart() {
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.lineTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
-    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.strokeStyle = 'rgba(42,42,40,0.22)';
     ctx.stroke();
   }
 
@@ -612,9 +612,9 @@ function updateRadarChart() {
     i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
   }
   ctx.closePath();
-  ctx.fillStyle = 'rgba(124,92,231,0.3)';
+  ctx.fillStyle = 'rgba(124,152,133,0.22)';
   ctx.fill();
-  ctx.strokeStyle = '#a78bfa';
+  ctx.strokeStyle = '#7C9885';
   ctx.lineWidth = 2;
   ctx.stroke();
 
@@ -733,7 +733,7 @@ function renderResults() {
   else if (s.total >= 40) { label = '⚠️ 你的睡眠债开始累积了，是时候调整了'; color = 'var(--accent3)'; }
   else { label = '🚨 睡眠赤字严重！建议认真还债，长期欠债伤身'; color = 'var(--danger)'; }
   document.getElementById('scoreLabel').textContent = label;
-  circle.style.background = `conic-gradient(${color} calc(${s.total} * 1%), rgba(255,255,255,.06) 0)`;
+  circle.style.background = `conic-gradient(${color} calc(${s.total} * 1%), rgba(42,42,40,.08) 0)`;
 
   // 分项
   setSubScore('subSleep', 'barSleep', 'valSleep', s.sleepEfficiency);
@@ -923,18 +923,18 @@ function savePoster() {
   if (saveBtn) saveBtn.style.display = 'none';
 
   // 修复 html2canvas 对 webkit 渐变文字的兼容问题：
-  // CSS 里用了 -webkit-background-clip:text + transparent fill → html2canvas
-  // 无法裁剪背景，会把渐变矩形整个画出来，文字本身反而不可见
+  // CSS 里若用了 -webkit-background-clip:text + transparent fill → html2canvas
+  // 无法裁剪背景。现在海报分数为实色衬线字，这里统一固化为浓墨色。
   const scoreEl = posterCard.querySelector('.poster-score');
   const styleFixes = [];
   if (scoreEl) {
     // 强制覆盖 CSS 样式表规则（不能用 '' 清除，否则样式表规则又生效）
     const overrides = [
-      ['-webkit-text-fill-color', '#ffffff'],
+      ['-webkit-text-fill-color', '#2A2A28'],
       ['-webkit-background-clip', 'border-box'],
       ['background', 'none'],
-      ['text-shadow', '0 0 16px rgba(78,201,224,.5)'],
-      ['color', '#ffffff']
+      ['text-shadow', 'none'],
+      ['color', '#2A2A28']
     ];
     for (const [prop, val] of overrides) {
       styleFixes.push([prop, scoreEl.style.getPropertyValue(prop)]);
@@ -943,7 +943,7 @@ function savePoster() {
   }
 
   html2canvas(posterCard, {
-    backgroundColor: '#0f1245',
+    backgroundColor: '#FFFDF8',
     scale: 2,
     useCORS: true,
     logging: false
@@ -996,16 +996,8 @@ function restartAll() {
 }
 window.restartAll = restartAll;
 
-// ──────────────── 验证码已移除 ────────────────
-function initCaptcha() {
-  sessionStorage.setItem('captchaVerified', '1');
-  var overlay = document.getElementById('captchaOverlay');
-  if (overlay) overlay.style.display = 'none';
-}
-
 // ──────────────── 初始化 ────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  initCaptcha();
   initStars();
 
   // 从量表参考页返回时恢复测评结果

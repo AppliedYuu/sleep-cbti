@@ -789,8 +789,6 @@ onMounted(() => {
   inset: 0;
   z-index: 900;
   background: rgba(42, 42, 40, 0.35);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
 }
 .log-drawer {
   position: absolute;

@@ -8,7 +8,6 @@
       <p class="card-content">{{ card.content }}</p>
 
       <div class="challenge-box">
-        <span class="challenge-icon">🎯</span>
         <p>{{ card.challenge }}</p>
       </div>
 
@@ -18,21 +17,24 @@
         :disabled="isCheckedIn"
         @click="doCheckIn"
       >
-        {{ isCheckedIn ? '✅ 今日已打卡' : '✊ 完成打卡' }}
+        {{ isCheckedIn ? '今日已打卡' : '完成打卡' }}
       </button>
     </div>
 
     <!-- 打卡记录 -->
     <div class="checkin-history" v-if="card">
-      <h3>📅 本周刺激控制打卡</h3>
+      <h3>本周刺激控制打卡</h3>
       <div class="week-dots">
         <span
           v-for="(day, di) in weekDays"
           :key="di"
           class="week-dot"
-          :class="{ done: di < card.dayIndex || isCheckedIn, today: di === card.dayIndex && !isCheckedIn }"
         >
-          <span class="dot-circle">{{ di < card.dayIndex || (di === card.dayIndex && isCheckedIn) ? '✅' : di === card.dayIndex ? '📍' : '○' }}</span>
+          <span
+            class="dot-circle"
+            :class="{ done: di < card.dayIndex || isCheckedIn, today: di === card.dayIndex && !isCheckedIn }"
+            aria-hidden="true"
+          ></span>
           <span class="dot-label">{{ day }}</span>
         </span>
       </div>
@@ -80,15 +82,14 @@ onMounted(loadCard);
 <style scoped>
 .stimulus-control { position: relative; min-height: 200px; }
 
+/* 实体纸卡 */
 .card-main {
-  background: var(--bg-glass);
+  background: var(--bg-surface);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
   padding: 1.5rem;
   text-align: center;
   box-shadow: var(--shadow-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   position: relative;
   overflow: hidden;
 }
@@ -96,11 +97,11 @@ onMounted(loadCard);
 .card-badge {
   display: inline-block;
   background: var(--primary-weak);
-  color: var(--accent-cyan);
+  color: var(--primary-strong);
   padding: 0.25rem 0.8rem;
   border-radius: var(--radius-pill);
   font-size: var(--fs-xs);
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: 1rem;
 }
 
@@ -120,60 +121,52 @@ onMounted(loadCard);
 }
 
 .challenge-box {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  background: var(--bg-soft);
+  background: var(--bg-sunken);
   border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--primary);
   border-radius: var(--radius-sm);
   padding: 0.8rem;
   margin-bottom: 1.2rem;
   text-align: left;
 }
 
-.challenge-icon { font-size: 1.2rem; flex-shrink: 0; }
-
 .challenge-box p { font-size: var(--fs-sm); color: var(--text-muted); line-height: 1.5; }
 
+/* 主色按钮：无发光、无位移 */
 .btn-checkin {
   width: 100%;
   padding: 0.8rem;
-  background: var(--accent-cyan);
+  background: var(--primary);
   color: var(--text-on-primary);
   border: none;
   border-radius: var(--radius-pill);
   font-size: var(--fs-lg);
-  font-weight: 600;
+  font-family: inherit;
+  font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 0 22px rgba(125, 211, 252, 0.35);
-  transition: all var(--dur-base) var(--ease-out);
+  transition: background var(--dur-base) var(--ease-out),
+              color var(--dur-base) var(--ease-out);
 }
 
-.btn-checkin:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 28px rgba(125, 211, 252, 0.5);
+.btn-checkin:hover:not(:disabled) {
+  background: var(--primary-strong);
 }
-
-.btn-checkin:active { transform: scale(0.98); }
 
 .btn-checkin.checked {
   background: var(--primary-weak);
-  color: var(--accent-mint);
-  box-shadow: var(--glow-mint);
-  cursor: default;
+  color: var(--primary-strong);
+  box-shadow: inset 0 0 0 1px var(--primary);
 }
 
 .btn-checkin:disabled { cursor: default; }
 
 .checkin-history {
-  background: var(--bg-glass);
+  background: var(--bg-surface);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
   padding: 1rem;
   margin-top: 1rem;
   box-shadow: var(--shadow-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .checkin-history h3 { font-size: var(--fs-md); color: var(--text-strong); margin-bottom: 0.8rem; }
@@ -190,24 +183,39 @@ onMounted(loadCard);
   gap: 0.3rem;
 }
 
-.dot-circle { font-size: 1.3rem; }
+/* 圆点状态：未到=描边圆 / 今日=主色描边 / 已完成=实心主色 */
+.dot-circle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-mid);
+  background: transparent;
+}
 
-.dot-circle .done { color: var(--accent-mint); }
+.dot-circle.today {
+  border-color: var(--primary-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-surface);
+  background: var(--primary-weak);
+}
 
-.week-dot.today .dot-circle { color: var(--accent-cyan); }
+.dot-circle.done {
+  border-color: var(--primary);
+  background: var(--primary);
+}
 
 .dot-label { font-size: var(--fs-xs); color: var(--text-muted); }
 
+/* Toast：全站统一深墨底 */
 .toast {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--accent-mint);
-  color: var(--text-on-primary);
+  background: var(--text-strong);
+  color: var(--bg-base);
   padding: 0.6rem 1.5rem;
-  border-radius: var(--radius-pill);
-  font-weight: 600;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
   z-index: 100;
   animation: fadeInOut 2s ease;
 }

@@ -3,7 +3,6 @@
     <!-- 发布表单 -->
     <div class="post-form">
       <div class="form-header">
-        <span class="form-icon">✍️</span>
         <span>分享你的 CBT-I 实践心得</span>
       </div>
       <textarea
@@ -19,7 +18,7 @@
           class="btn-post"
           :disabled="!newPost.trim() || posting"
           @click="doPost"
-        >{{ posting ? '发布中...' : '📤 发布' }}</button>
+        >{{ posting ? '发布中...' : '发布' }}</button>
       </div>
     </div>
 
@@ -27,7 +26,7 @@
     <div v-if="posts.length" class="post-list">
       <div v-for="post in posts" :key="post.id" class="post-card">
         <div class="post-header">
-          <span class="post-avatar">😴</span>
+          <span class="post-avatar">匿</span>
           <span class="post-user">{{ post.display_name }}</span>
           <span class="post-time">{{ post.timeAgo }}</span>
         </div>
@@ -45,7 +44,10 @@
     </div>
 
     <div v-else class="empty-state">
-      <span class="empty-icon">📖</span>
+      <svg class="empty-icon" viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="17" fill="none" stroke="var(--border-mid)" stroke-width="2"/>
+        <circle cx="40" cy="26" r="15" fill="var(--bg-base)"/>
+      </svg>
       <p>还没有人分享，来做第一个吧！</p>
       <p class="empty-hint">分享你的CBT-I实践心得、小胜利或感悟</p>
     </div>
@@ -138,31 +140,24 @@ onMounted(() => loadPosts());
 <style scoped>
 .topic-circle { min-height: 200px; position: relative; }
 
-/* 发布表单 —— 玻璃卡片 */
+/* 发布表单 —— 实体纸卡 */
 .post-form {
-  background: var(--bg-glass);
+  background: var(--bg-surface);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
   padding: 1rem 1.2rem;
   box-shadow: var(--shadow-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   margin-bottom: 1rem;
 }
 
 .form-header {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-strong);
   margin-bottom: 0.6rem;
 }
 
-.form-icon { font-size: 1.1rem; }
-
-/* 输入框 —— 软背景 + 月光聚焦 */
+/* 输入框 —— 沉底色 + 焦点环 */
 .post-textarea {
   width: 100%;
   padding: 0.6rem 0.8rem;
@@ -173,7 +168,7 @@ onMounted(() => loadPosts());
   resize: vertical;
   font-family: inherit;
   color: var(--text-strong);
-  background: var(--bg-soft);
+  background: var(--bg-sunken);
   transition: border-color var(--dur-base) var(--ease-out),
               box-shadow var(--dur-base) var(--ease-out);
 }
@@ -182,7 +177,7 @@ onMounted(() => loadPosts());
 
 .post-textarea:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-weak);
+  box-shadow: var(--focus-ring);
 }
 
 .form-footer {
@@ -194,28 +189,23 @@ onMounted(() => loadPosts());
 
 .char-count { font-size: 0.72rem; color: var(--text-faint); }
 
-/* 发布按钮 —— 玫瑰强调 + 暖光 */
+/* 发布按钮 —— 社区柔粉，无发光 */
 .btn-post {
   padding: 0.5rem 1.5rem;
   background: var(--accent-rose);
-  color: var(--text-on-primary);
+  color: var(--bg-deep);
   border: none;
   border-radius: var(--radius-pill);
   font-size: 0.85rem;
-  font-weight: 600;
+  font-family: inherit;
+  font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 0 18px rgba(255, 155, 179, 0.35);
-  transition: transform var(--dur-base) var(--ease-out),
-              box-shadow var(--dur-base) var(--ease-out),
-              filter var(--dur-base) var(--ease-out);
+  transition: filter var(--dur-base) var(--ease-out);
 }
 
 .btn-post:hover:not(:disabled) {
-  filter: brightness(1.05);
-  box-shadow: 0 0 24px rgba(255, 155, 179, 0.5);
+  filter: brightness(0.96);
 }
-
-.btn-post:active:not(:disabled) { transform: scale(0.98); }
 
 .btn-post:disabled { opacity: 0.45; cursor: not-allowed; }
 
@@ -226,24 +216,13 @@ onMounted(() => loadPosts());
   gap: 0.6rem;
 }
 
-/* 帖子卡片 —— 玻璃 + 悬停抬升 + 玫瑰柔光 */
+/* 帖子卡片 —— 实体纸卡 */
 .post-card {
-  background: var(--bg-glass);
+  background: var(--bg-surface);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
   padding: 1rem 1.2rem;
   box-shadow: var(--shadow-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: transform var(--dur-base) var(--ease-out),
-              box-shadow var(--dur-base) var(--ease-out),
-              border-color var(--dur-base) var(--ease-out);
-}
-
-.post-card:hover {
-  transform: translateY(-3px);
-  border-color: var(--border-glow);
-  box-shadow: var(--shadow-float), 0 0 22px rgba(255, 155, 179, 0.18);
 }
 
 .post-header {
@@ -253,23 +232,25 @@ onMounted(() => loadPosts());
   margin-bottom: 0.6rem;
 }
 
-/* 头像 —— 圆形 + 玫瑰柔光 */
+/* 头像 —— 衬线「匿」字圆章 */
 .post-avatar {
-  font-size: 1.2rem;
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
   width: 2rem;
   height: 2rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: var(--bg-soft);
-  filter: drop-shadow(0 0 8px rgba(255, 155, 179, 0.4));
+  background: var(--bg-sunken);
+  color: var(--text-muted);
+  flex-shrink: 0;
 }
 
 .post-user {
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--accent-rose);
+  color: var(--text-strong);
 }
 
 .post-time {
@@ -288,7 +269,7 @@ onMounted(() => loadPosts());
 
 .post-footer { display: flex; justify-content: flex-end; }
 
-/* 点赞按钮 —— 玫瑰浅底胶囊 */
+/* 点赞按钮 —— 柔粉弱底胶囊 */
 .btn-like {
   display: flex;
   align-items: center;
@@ -296,23 +277,25 @@ onMounted(() => loadPosts());
   padding: 0.3rem 0.8rem;
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-pill);
-  background: rgba(255, 155, 179, 0.12);
+  background: var(--accent-rose-weak);
   font-size: 0.78rem;
+  font-family: inherit;
   cursor: pointer;
-  color: var(--accent-rose);
-  transition: all var(--dur-base) var(--ease-out);
+  color: var(--text-muted);
+  transition: border-color var(--dur-base) var(--ease-out),
+              color var(--dur-base) var(--ease-out),
+              background var(--dur-base) var(--ease-out);
 }
 
 .btn-like:hover {
   border-color: var(--accent-rose);
-  background: rgba(255, 155, 179, 0.2);
+  color: var(--text-strong);
 }
 
 .btn-like.liked {
   border-color: var(--accent-rose);
-  background: rgba(255, 155, 179, 0.24);
-  color: var(--accent-rose);
-  box-shadow: 0 0 14px rgba(255, 155, 179, 0.3);
+  background: var(--accent-rose-weak);
+  color: var(--text-strong);
 }
 
 /* 空状态 */
@@ -321,7 +304,7 @@ onMounted(() => loadPosts());
   padding: 3rem 1rem;
 }
 
-.empty-icon { font-size: 3rem; display: block; margin-bottom: 0.5rem; }
+.empty-icon { width: 56px; height: 56px; display: block; margin: 0 auto 0.5rem; }
 
 .empty-state p { color: var(--text-muted); font-size: 0.9rem; }
 .empty-hint { font-size: 0.78rem !important; margin-top: 0.3rem; color: var(--text-faint); }
@@ -332,40 +315,38 @@ onMounted(() => loadPosts());
   padding: 0.5rem 1.5rem;
   border: 1px solid var(--border-mid);
   border-radius: var(--radius-pill);
-  background: var(--bg-soft);
+  background: transparent;
   color: var(--text-muted);
   font-size: 0.85rem;
+  font-family: inherit;
   cursor: pointer;
-  transition: all var(--dur-base) var(--ease-out);
+  transition: border-color var(--dur-base) var(--ease-out),
+              color var(--dur-base) var(--ease-out);
 }
 
 .btn-load-more:hover {
-  color: var(--text-strong);
-  border-color: var(--border-glow);
-  background: var(--bg-hover);
+  color: var(--primary-strong);
+  border-color: var(--primary);
 }
 
-/* 提示 toast —— 语义色 */
+/* 提示 toast —— 深墨底 + 语义左边条 */
 .toast {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
   padding: 0.6rem 1.2rem;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
   font-size: 0.85rem;
-  font-weight: 600;
   z-index: 100;
   animation: fadeInOut 3s ease;
-  background: var(--success);
-  color: var(--text-on-primary);
-  border: 1px solid var(--border-soft);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: var(--text-strong);
+  color: var(--bg-base);
+  border-left: 3px solid var(--success);
 }
 
-.toast.warn { background: var(--warning); color: var(--text-on-primary); }
-.toast.error { background: var(--danger); color: var(--text-on-primary); }
+.toast.warn { border-left-color: var(--warning); }
+.toast.error { border-left-color: var(--danger); }
 
 @keyframes fadeInOut {
   0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }

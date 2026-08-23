@@ -3,7 +3,6 @@
     <!-- 未加入状态 - 营地选择 -->
     <div v-if="!myCamp.joined" class="camp-select">
       <div class="section-intro">
-        <span class="intro-icon">🏕️</span>
         <p>选择一个适合你作息的挑战营，和匿名的伙伴们一起坚持固定作息。</p>
       </div>
 
@@ -46,8 +45,8 @@
             <span class="mcc-stat-label">目标作息</span>
           </div>
           <div class="mcc-stat-item">
-            <span class="mcc-stat-val">{{ myCamp.todayCheckedIn ? '✅' : '○' }}</span>
-            <span class="mcc-stat-label">今日打卡</span>
+            <span class="mcc-stat-val">{{ myCamp.todayCheckedIn ? '已打卡' : '未打卡' }}</span>
+            <span class="mcc-stat-label">今日状态</span>
           </div>
         </div>
       </div>
@@ -59,12 +58,12 @@
         :disabled="myCamp.todayCheckedIn"
         @click="doCheckIn"
       >
-        {{ myCamp.todayCheckedIn ? '✅ 今日已打卡' : '✊ 今日打卡' }}
+        {{ myCamp.todayCheckedIn ? '今日已打卡' : '今日打卡' }}
       </button>
 
       <!-- 群体统计（签到率） -->
       <div class="group-stats-card">
-        <h3>📊 今日挑战营概览</h3>
+        <h3>今日挑战营概览</h3>
         <div class="gs-row">
           <div class="gs-item">
             <span class="gs-val">{{ stats.memberCount || '--' }}</span>
@@ -88,10 +87,10 @@
 
       <!-- 连续打卡光荣榜（匿名） -->
       <div v-if="stats.topStreaks?.length" class="streak-board">
-        <h3>🔥 连续打卡光荣榜</h3>
+        <h3>连续打卡光荣榜</h3>
         <div class="streak-list">
           <div v-for="(s, i) in stats.topStreaks" :key="i" class="streak-item">
-            <span class="streak-rank">{{ ['🥇','🥈','🥉','4️⃣','5️⃣'][i] }}</span>
+            <span class="streak-rank">{{ i + 1 }}</span>
             <span class="streak-text">{{ s.label }}</span>
           </div>
         </div>
@@ -187,13 +186,8 @@ onMounted(async () => {
 
 /* ---- 营地选择：简介 ---- */
 .section-intro {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  background: var(--bg-glass);
+  background: var(--bg-sunken);
   border: 1px solid var(--border-soft);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius-sm);
   padding: 0.8rem 1rem;
   margin-bottom: 1rem;
@@ -202,32 +196,24 @@ onMounted(async () => {
   line-height: 1.5;
 }
 
-.intro-icon { font-size: 1.5rem; flex-shrink: 0; }
-
 .camp-cards { display: flex; flex-direction: column; gap: 0.7rem; }
 
-/* ---- 营地卡片（玻璃） ---- */
+/* ---- 营地卡片：实体纸卡 ---- */
 .camp-card {
-  background: var(--bg-glass);
+  background: var(--bg-surface);
   border: 1px solid var(--border-soft);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius-md);
   padding: 1rem 1.2rem;
   box-shadow: var(--shadow-card);
   cursor: pointer;
-  transition: transform var(--dur-base) var(--ease-out),
-              box-shadow var(--dur-base) var(--ease-out),
+  transition: box-shadow var(--dur-base) var(--ease-out),
               border-color var(--dur-base) var(--ease-out);
 }
 
 .camp-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--border-glow);
-  box-shadow: var(--shadow-float), 0 0 22px rgba(255, 155, 179, 0.18);
+  border-color: var(--border-mid);
+  box-shadow: var(--shadow-float);
 }
-
-.camp-card:active { transform: scale(0.98); }
 
 .camp-card-top {
   display: flex;
@@ -245,13 +231,13 @@ onMounted(async () => {
   font-size: 0.68rem;
   padding: 0.2rem 0.5rem;
   border-radius: var(--radius-pill);
-  font-weight: 600;
+  font-weight: 500;
   background: var(--primary-weak);
-  color: var(--primary);
+  color: var(--primary-strong);
 }
 
-.camp-difficulty.easy { background: rgba(94, 234, 212, 0.14); color: var(--accent-mint); }
-.camp-difficulty.hard { background: rgba(255, 210, 138, 0.14); color: var(--accent-amber); }
+.camp-difficulty.easy { background: var(--accent-mint-weak); color: var(--primary-strong); }
+.camp-difficulty.hard { background: var(--accent-amber-weak); color: var(--accent-clay); }
 
 .camp-card-bottom {
   display: flex;
@@ -260,17 +246,16 @@ onMounted(async () => {
 }
 
 .camp-time { font-size: 0.78rem; color: var(--text-base); font-weight: 500; }
-.camp-join-hint { font-size: 0.78rem; color: var(--accent-rose); font-weight: 600; }
+.camp-join-hint { font-size: 0.78rem; color: var(--primary-strong); font-weight: 500; }
 
-/* ---- 已加入：我的营地卡片（玻璃 + 玫瑰光晕） ---- */
+/* ---- 已加入：我的营地卡片（顶部一条柔粉识别线） ---- */
 .my-camp-card {
-  background: var(--bg-glass-strong);
+  background: var(--bg-surface);
   border: 1px solid var(--border-mid);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  border-top: 3px solid var(--accent-rose);
   border-radius: var(--radius-lg);
   padding: 1.2rem;
-  box-shadow: var(--shadow-card), 0 0 26px rgba(255, 155, 179, 0.12);
+  box-shadow: var(--shadow-card);
   margin-bottom: 0.8rem;
 }
 
@@ -293,56 +278,56 @@ onMounted(async () => {
 .mcc-stat-item {
   flex: 1;
   text-align: center;
-  background: var(--bg-soft);
+  background: var(--bg-sunken);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-sm);
   padding: 0.5rem 0.3rem;
 }
 
-.mcc-stat-val { display: block; font-size: 1.1rem; font-weight: 700; color: var(--text-strong); }
+.mcc-stat-val {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--text-strong);
+}
 .mcc-stat-label { font-size: 0.68rem; color: var(--text-muted); }
 
-/* ---- 打卡按钮：玫瑰主色 ---- */
+/* ---- 打卡按钮：社区柔粉主色，无发光无位移 ---- */
 .btn-checkin-camp {
   width: 100%;
   padding: 0.8rem;
   background: var(--accent-rose);
-  color: var(--text-on-primary);
+  color: var(--bg-deep);
   border: none;
   border-radius: var(--radius-pill);
   font-size: 1rem;
-  font-weight: 600;
+  font-family: inherit;
+  font-weight: 500;
   cursor: pointer;
   margin-bottom: 0.8rem;
-  box-shadow: 0 0 22px rgba(255, 155, 179, 0.30);
-  transition: transform var(--dur-base) var(--ease-out),
-              box-shadow var(--dur-base) var(--ease-out),
-              filter var(--dur-base) var(--ease-out);
+  transition: background var(--dur-base) var(--ease-out),
+              color var(--dur-base) var(--ease-out);
 }
 
-.btn-checkin-camp:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 30px rgba(255, 155, 179, 0.45);
+.btn-checkin-camp:hover:not(:disabled) {
+  filter: brightness(0.96);
 }
 
-.btn-checkin-camp:active { transform: scale(0.98); }
-
-/* 完成 / 成功态：薄荷绿 */
+/* 完成态：与全站统一的弱色 + 内描边 */
 .btn-checkin-camp.done {
-  background: var(--accent-mint);
-  color: var(--text-on-primary);
-  box-shadow: var(--glow-mint);
+  background: var(--primary-weak);
+  color: var(--primary-strong);
+  box-shadow: inset 0 0 0 1px var(--primary);
   cursor: default;
 }
 
 .btn-checkin-camp:disabled { cursor: default; }
 
-/* ---- 群体统计卡片（玻璃） ---- */
+/* ---- 群体统计卡片 ---- */
 .group-stats-card {
-  background: var(--bg-glass);
+  background: var(--bg-surface);
   border: 1px solid var(--border-soft);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius-md);
   padding: 1rem 1.2rem;
   box-shadow: var(--shadow-card);
@@ -357,12 +342,19 @@ onMounted(async () => {
   flex: 1;
   text-align: center;
   padding: 0.5rem 0.2rem;
-  background: var(--bg-soft);
+  background: var(--bg-sunken);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-sm);
 }
 
-.gs-val { display: block; font-size: 1.1rem; font-weight: 700; color: var(--accent-rose); }
+.gs-val {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--accent-clay);
+  font-variant-numeric: tabular-nums;
+}
 .gs-label { font-size: 0.68rem; color: var(--text-muted); }
 
 .gs-message {
@@ -372,12 +364,10 @@ onMounted(async () => {
   text-align: center;
 }
 
-/* ---- 连续打卡光荣榜（玻璃） ---- */
+/* ---- 连续打卡光荣榜 ---- */
 .streak-board {
-  background: var(--bg-glass);
+  background: var(--bg-surface);
   border: 1px solid var(--border-soft);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius-md);
   padding: 1rem 1.2rem;
   box-shadow: var(--shadow-card);
@@ -396,7 +386,19 @@ onMounted(async () => {
   color: var(--text-base);
 }
 
-.streak-rank { font-size: 1rem; }
+.streak-rank {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-clay-weak);
+  color: var(--accent-clay);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
 .streak-note { font-size: 0.68rem; color: var(--text-faint); margin-top: 0.4rem; text-align: center; }
 
 /* ---- 退出按钮（幽灵按钮） ---- */
@@ -408,6 +410,7 @@ onMounted(async () => {
   background: transparent;
   color: var(--text-muted);
   font-size: 0.85rem;
+  font-family: inherit;
   cursor: pointer;
   transition: border-color var(--dur-base) var(--ease-out),
               color var(--dur-base) var(--ease-out);
@@ -418,20 +421,18 @@ onMounted(async () => {
   color: var(--danger);
 }
 
-/* ---- Toast 提示 ---- */
+/* ---- Toast：全站统一深墨底 ---- */
 .toast {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--accent-rose);
-  color: var(--text-on-primary);
+  background: var(--text-strong);
+  color: var(--bg-base);
   padding: 0.6rem 1.2rem;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
   font-size: 0.85rem;
-  font-weight: 600;
   z-index: 100;
-  box-shadow: 0 0 24px rgba(255, 155, 179, 0.35);
   animation: fadeInOut 2.5s ease;
 }
 
