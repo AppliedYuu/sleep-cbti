@@ -1,13 +1,13 @@
 <template>
   <div class="radar-chart-container">
     <svg :viewBox="`0 0 ${size} ${size}`" :width="size" :height="size">
-      <!-- 背景网格 -->
+      <!-- 背景网格（纸墨色板：鼠尾草绿低饱和） -->
       <g v-for="(level, li) in levels" :key="'level-' + li">
         <polygon
           :points="getGridPoints(level)"
-          :fill="li === levels.length - 1 ? 'rgba(138,180,248,0.06)' : 'none'"
-          :stroke="li === levels.length - 1 ? '#8ab4f8' : 'rgba(138,180,248,0.18)'"
-          :stroke-width="li === levels.length - 1 ? 1.5 : 0.8"
+          :fill="li === levels.length - 1 ? 'rgba(124,152,133,0.05)' : 'none'"
+          :stroke="li === levels.length - 1 ? 'rgba(124,152,133,0.50)' : 'rgba(124,152,133,0.16)'"
+          :stroke-width="li === levels.length - 1 ? 1 : 0.6"
         />
       </g>
 
@@ -19,28 +19,28 @@
         :y1="cy"
         :x2="getPoint(i, maxVal).x"
         :y2="getPoint(i, maxVal).y"
-        stroke="rgba(138,180,248,0.12)"
+        stroke="rgba(124,152,133,0.12)"
         stroke-width="0.8"
       />
 
       <!-- 数据区域 -->
       <polygon
         :points="dataPoints"
-        fill="rgba(138,180,248,0.22)"
-        stroke="#8ab4f8"
+        fill="rgba(124,152,133,0.18)"
+        stroke="#7C9885"
         stroke-width="2"
         stroke-linejoin="round"
       />
 
-      <!-- 数据点 -->
+      <!-- 数据点：纸白底 + 鼠尾草描边 -->
       <circle
         v-for="(item, i) in data"
         :key="'dot-' + i"
         :cx="getPoint(i, item.score).x"
         :cy="getPoint(i, item.score).y"
-        r="5"
-        fill="#0f1426"
-        stroke="#8ab4f8"
+        r="4"
+        fill="#FFFFFF"
+        stroke="#7C9885"
         stroke-width="2"
       />
 

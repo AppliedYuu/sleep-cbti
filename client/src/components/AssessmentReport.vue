@@ -2,25 +2,24 @@
   <div class="report-page">
     <div class="report-header">
       <button class="btn-back" @click="$emit('back')">← 返回</button>
-      <h1>📈 我的睡眠评估报告</h1>
+      <h1>我的睡眠评估报告</h1>
       <p class="report-date">{{ reportDate }}</p>
     </div>
 
     <!-- 睡眠六维图 -->
     <section class="report-section">
-      <h2>🔍 我的睡眠六维图</h2>
+      <h2>我的睡眠六维图</h2>
       <p class="section-desc">分数越高越好（0-100分），反映您的睡眠综合状况</p>
       <RadarChart :data="reportData.radarData" />
     </section>
 
     <!-- 量表结果概览 -->
     <section class="report-section">
-      <h2>📊 三大量表结果</h2>
+      <h2>三大量表结果</h2>
 
       <div class="result-cards">
         <div class="result-card" :class="psqiClass">
           <div class="rc-header">
-            <span class="rc-icon">📊</span>
             <span class="rc-name">PSQI</span>
           </div>
           <div class="rc-score">{{ reportData.psqi?.totalScore }} <small>/ 21</small></div>
@@ -29,7 +28,6 @@
 
         <div class="result-card" :class="shpsClass">
           <div class="rc-header">
-            <span class="rc-icon">🛏️</span>
             <span class="rc-name">SHPS</span>
           </div>
           <div class="rc-score">{{ reportData.shps?.totalScore }} <small>/ 133</small></div>
@@ -38,7 +36,6 @@
 
         <div class="result-card" :class="dbas16Class">
           <div class="rc-header">
-            <span class="rc-icon">🧠</span>
             <span class="rc-name">DBAS-16</span>
           </div>
           <div class="rc-score">{{ reportData.dbas16?.averageScore }} <small>/ 10</small></div>
@@ -49,7 +46,7 @@
 
     <!-- 综合评估 -->
     <section class="report-section">
-      <h2>📝 综合评估</h2>
+      <h2>综合评估</h2>
       <div class="summary-box">
         <p>{{ reportData.summary }}</p>
       </div>
@@ -57,7 +54,7 @@
 
     <!-- 干预策略推荐 -->
     <section class="report-section">
-      <h2>💡 干预策略推荐</h2>
+      <h2>干预策略推荐</h2>
       <div class="intervention-list">
         <div
           v-for="(item, idx) in reportData.interventions"
@@ -69,7 +66,6 @@
             <span class="int-priority" :class="item.priority">
               {{ item.priority === 'high' ? '优先推荐' : item.priority === 'medium' ? '建议尝试' : '可选' }}
             </span>
-            <span class="int-type">{{ getInterventionIcon(item.type) }}</span>
           </div>
           <h4>{{ item.name }}</h4>
           <p>{{ item.reason }}</p>
@@ -79,8 +75,8 @@
 
     <!-- 行动按钮 -->
     <div class="report-actions">
-      <button class="btn-primary" @click="goToIntervention">🎯 查看详细干预方案</button>
-      <button class="btn-secondary" @click="goToDiary">📓 开始记录睡眠日记</button>
+      <button class="btn-primary" @click="goToIntervention">查看详细干预方案</button>
+      <button class="btn-secondary" @click="goToDiary">开始记录睡眠日记</button>
     </div>
   </div>
 </template>
@@ -146,17 +142,6 @@ const dbas16Class = computed(() => {
   return 'bad';
 });
 
-function getInterventionIcon(type) {
-  const map = {
-    sleep_restriction: '⏰',
-    stimulus_control: '🛌',
-    cognitive_restructure: '🧠',
-    relaxation: '🧘',
-    sleep_hygiene: '✅',
-  };
-  return map[type] || '📌';
-}
-
 function goToIntervention() {
   router.push('/intervention');
 }
@@ -174,43 +159,37 @@ function goToDiary() {
   color: var(--text-base);
 }
 
+/* 纸面头部：无渐变无玻璃 */
 .report-header {
   padding: 1.5rem 1.2rem 1rem;
-  background: linear-gradient(135deg, rgba(138, 180, 248, 0.18), rgba(183, 148, 246, 0.14));
+  background: var(--bg-base);
   border-bottom: 1px solid var(--border-soft);
   color: var(--text-strong);
   text-align: center;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .btn-back {
-  background: var(--bg-glass);
-  border: 1px solid var(--border-soft);
-  color: var(--text-strong);
-  padding: 0.4rem 0.8rem;
+  background: transparent;
+  border: 1px solid var(--border-mid);
+  color: var(--text-base);
+  padding: 0.35rem 0.8rem;
   border-radius: var(--radius-sm);
   font-size: var(--fs-sm);
+  font-family: inherit;
   cursor: pointer;
   margin-bottom: 0.5rem;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: background var(--dur-fast) var(--ease-out),
-              transform var(--dur-fast) var(--ease-out);
+  transition: border-color var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out);
 }
 
 .btn-back:hover {
-  background: var(--bg-hover);
-}
-
-.btn-back:active {
-  transform: scale(0.98);
+  border-color: var(--primary);
+  color: var(--primary-strong);
 }
 
 .report-header h1 {
   font-size: 1.3rem;
   color: var(--text-strong);
-  text-shadow: var(--glow-primary);
 }
 
 .report-date {
@@ -219,22 +198,18 @@ function goToDiary() {
   margin-top: 0.3rem;
 }
 
+/* 实体纸卡分区 */
 .report-section {
-  background: var(--bg-glass);
+  background: var(--bg-surface);
   margin: 0.8rem 1.2rem;
   border-radius: var(--radius-md);
   padding: 1.2rem;
   border: 1px solid var(--border-soft);
   box-shadow: var(--shadow-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: transform var(--dur-base) var(--ease-out),
-              box-shadow var(--dur-base) var(--ease-out);
 }
 
 .report-section:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-soft), var(--glow-primary);
+  box-shadow: var(--shadow-float);
 }
 
 .report-section h2 {
@@ -261,33 +236,31 @@ function goToDiary() {
   text-align: center;
   padding: 0.8rem 0.5rem;
   border-radius: var(--radius-md);
-  background: var(--bg-soft);
+  background: var(--bg-sunken);
   border: 1px solid var(--border-soft);
-  transition: transform var(--dur-base) var(--ease-out),
-              box-shadow var(--dur-base) var(--ease-out);
+  border-left-width: 3px;
 }
 
-.result-card:hover {
-  transform: translateY(-3px);
-}
-
+/* 四档状态：弱色铺底 + 左侧实色条，数字保持浓墨 */
 .result-card.good {
-  background: rgba(94, 234, 212, 0.10);
-  border: 1px solid rgba(94, 234, 212, 0.45);
-  box-shadow: var(--glow-mint);
+  background: var(--accent-mint-weak);
+  border-color: rgba(127, 179, 166, 0.35);
+  border-left-color: var(--accent-mint);
 }
 .result-card.fair {
-  background: rgba(255, 210, 138, 0.10);
-  border: 1px solid rgba(255, 210, 138, 0.45);
-  box-shadow: var(--glow-amber);
+  background: var(--accent-amber-weak);
+  border-color: rgba(217, 164, 65, 0.35);
+  border-left-color: var(--accent-amber);
 }
 .result-card.warn {
-  background: rgba(255, 138, 155, 0.10);
-  border: 1px solid rgba(255, 138, 155, 0.45);
+  background: var(--accent-clay-weak);
+  border-color: rgba(201, 123, 90, 0.35);
+  border-left-color: var(--accent-clay);
 }
 .result-card.bad {
-  background: rgba(255, 107, 107, 0.10);
-  border: 1px solid rgba(255, 107, 107, 0.45);
+  background: var(--accent-rose-weak);
+  border-color: rgba(217, 138, 158, 0.35);
+  border-left-color: var(--accent-rose);
 }
 
 .rc-header {
@@ -298,30 +271,25 @@ function goToDiary() {
   margin-bottom: 0.3rem;
 }
 
-.rc-icon { font-size: 1.1rem; }
-.rc-name { font-size: var(--fs-sm); font-weight: 700; color: var(--text-muted); }
+.rc-name { font-size: var(--fs-sm); font-weight: 600; color: var(--text-muted); letter-spacing: 0.04em; }
 
 .rc-score {
+  font-family: var(--font-serif);
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-strong);
-  text-shadow: var(--glow-primary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
-
-.result-card.good .rc-score { color: var(--accent-mint); text-shadow: var(--glow-mint); }
-.result-card.fair .rc-score { color: var(--warning); text-shadow: var(--glow-amber); }
-.result-card.warn .rc-score { color: var(--accent-amber); text-shadow: var(--glow-amber); }
-.result-card.bad .rc-score { color: var(--danger); }
 
 .rc-score small { font-size: var(--fs-xs); color: var(--text-muted); }
 .rc-level { font-size: var(--fs-xs); color: var(--text-muted); margin-top: 0.2rem; }
 
 .summary-box {
-  background: var(--bg-soft);
+  background: var(--bg-sunken);
   border-radius: var(--radius-sm);
   padding: 1rem;
   border-left: 3px solid var(--primary);
-  box-shadow: inset 0 0 0 1px var(--border-soft);
 }
 
 .summary-box p {
@@ -339,27 +307,18 @@ function goToDiary() {
 .intervention-card {
   padding: 1rem;
   border-radius: var(--radius-md);
-  background: var(--bg-soft);
+  background: var(--bg-sunken);
   border: 1px solid var(--border-soft);
-  transition: transform var(--dur-base) var(--ease-out),
-              box-shadow var(--dur-base) var(--ease-out);
-}
-
-.intervention-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-soft);
 }
 
 .intervention-card.priority-high {
-  background: rgba(138, 180, 248, 0.12);
-  border-color: var(--border-glow);
-  box-shadow: var(--glow-primary);
+  background: var(--primary-weak);
+  border-color: rgba(124, 152, 133, 0.35);
 }
 
 .intervention-card.priority-medium {
-  background: rgba(255, 210, 138, 0.10);
-  border-color: rgba(255, 210, 138, 0.40);
-  box-shadow: var(--glow-amber);
+  background: var(--accent-amber-weak);
+  border-color: rgba(217, 164, 65, 0.40);
 }
 
 .int-header {
@@ -373,14 +332,12 @@ function goToDiary() {
   font-size: var(--fs-xs);
   padding: 0.15rem 0.5rem;
   border-radius: var(--radius-pill);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .int-priority.high { background: var(--primary); color: var(--text-on-primary); }
 .int-priority.medium { background: var(--accent-amber); color: var(--bg-deep); }
-.int-priority.low { background: var(--bg-elevated); color: var(--text-muted); border: 1px solid var(--border-soft); }
-
-.int-type { font-size: 1.3rem; }
+.int-priority.low { background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border-soft); }
 
 .intervention-card h4 {
   font-size: var(--fs-lg);
@@ -407,42 +364,30 @@ function goToDiary() {
   border: none;
   border-radius: var(--radius-pill);
   font-size: 1rem;
+  font-family: inherit;
   cursor: pointer;
-  transition: transform var(--dur-fast) var(--ease-out),
-              box-shadow var(--dur-base) var(--ease-out),
-              background var(--dur-base) var(--ease-out);
+  transition: background var(--dur) var(--ease),
+              border-color var(--dur) var(--ease);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+  background: var(--primary);
   color: var(--text-on-primary);
-  font-weight: 600;
-  box-shadow: var(--glow-primary);
+  font-weight: 500;
 }
 
 .btn-primary:hover {
-  box-shadow: var(--glow-primary), var(--shadow-float);
-  transform: translateY(-2px);
-}
-
-.btn-primary:active {
-  transform: scale(0.98);
+  background: var(--primary-strong);
 }
 
 .btn-secondary {
-  background: var(--bg-glass);
-  color: var(--primary);
-  border: 1px solid var(--border-glow);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: transparent;
+  color: var(--primary-strong);
+  border: 1px solid var(--border-mid);
 }
 
 .btn-secondary:hover {
   background: var(--bg-hover);
-  transform: translateY(-2px);
-}
-
-.btn-secondary:active {
-  transform: scale(0.98);
+  border-color: var(--primary);
 }
 </style>

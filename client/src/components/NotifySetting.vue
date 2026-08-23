@@ -1,7 +1,7 @@
 <template>
   <div class="notify-overlay" v-if="visible" @click.self="visible = false">
     <div class="notify-card">
-      <h3>🔔 睡眠提醒</h3>
+      <h3>睡眠提醒</h3>
       <p class="notify-desc">每天固定时间提醒你准备睡觉</p>
 
       <div class="time-picker">
@@ -18,11 +18,11 @@
       </div>
 
       <div class="notify-actions">
-        <button class="btn-save" @click="saveNotify">✅ 开启提醒</button>
+        <button class="btn-save" @click="saveNotify">开启提醒</button>
         <button v-if="active" class="btn-cancel" @click="cancelNotify">关闭提醒</button>
       </div>
 
-      <p v-if="active" class="notify-status">✅ 已设置 · 每天 {{ pad(hour) }}:{{ pad(minute) }} 提醒</p>
+      <p v-if="active" class="notify-status">已设置 · 每天 {{ pad(hour) }}:{{ pad(minute) }} 提醒</p>
       <p v-if="msg" class="notify-msg">{{ msg }}</p>
       <button class="btn-close" @click="visible = false">关闭</button>
     </div>
@@ -78,9 +78,7 @@ defineExpose({ open });
 <style scoped>
 .notify-overlay {
   position: fixed; inset: 0;
-  background: rgba(11, 16, 32, 0.6);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(42, 42, 40, 0.35);
   display: flex; align-items: center; justify-content: center; z-index: 999;
   animation: notify-fade var(--dur-base) var(--ease-out) both;
 }
@@ -90,27 +88,25 @@ defineExpose({ open });
 }
 
 .notify-card {
-  background: var(--bg-glass-strong);
+  background: var(--bg-surface);
   border: 1px solid var(--border-mid);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-float);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   padding: var(--space-4);
   width: min(300px, calc(100vw - 2.4rem));
   text-align: center;
-  animation: notify-rise var(--dur-slow) var(--ease-spring) both;
+  animation: notify-rise var(--dur-slow) var(--ease-out) both;
 }
 @keyframes notify-rise {
-  from { opacity: 0; transform: translateY(16px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .notify-card h3 {
   font-size: var(--fs-lg);
   color: var(--text-strong);
   margin-bottom: var(--space-1);
-  font-weight: 700;
+  font-weight: 500;
 }
 .notify-desc {
   font-size: var(--fs-sm);
@@ -124,9 +120,11 @@ defineExpose({ open });
 }
 .tp-select {
   padding: 0.5rem 1rem;
-  font-size: var(--fs-xl);
-  font-weight: 700;
-  background: var(--bg-soft);
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  background: var(--bg-sunken);
   color: var(--text-strong);
   border: 1px solid var(--border-mid);
   border-radius: var(--radius-sm);
@@ -137,11 +135,12 @@ defineExpose({ open });
 .tp-select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-weak);
+  box-shadow: var(--focus-ring);
 }
 .tp-colon {
-  font-size: var(--fs-xl);
-  font-weight: 700;
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  font-weight: 500;
   color: var(--text-base);
 }
 
@@ -150,39 +149,32 @@ defineExpose({ open });
 }
 .btn-save {
   padding: 0.6rem;
-  background: var(--accent-amber);
+  background: var(--primary);
   color: var(--text-on-primary);
   border: none;
   border-radius: var(--radius-sm);
   font-size: var(--fs-md);
-  font-weight: 600;
+  font-family: inherit;
+  font-weight: 500;
   cursor: pointer;
-  box-shadow: var(--glow-amber);
-  transition: transform var(--dur-fast) var(--ease-out),
-              box-shadow var(--dur-fast) var(--ease-out);
+  transition: background var(--dur-fast) var(--ease-out);
 }
 .btn-save:hover {
-  box-shadow: 0 0 28px rgba(255, 210, 138, 0.40);
-}
-.btn-save:active {
-  transform: scale(0.98);
+  background: var(--primary-strong);
 }
 .btn-cancel {
-  padding: 0.5rem;
+  padding: 0.6rem;
   background: transparent;
   color: var(--danger);
   border: 1px solid var(--danger);
   border-radius: var(--radius-sm);
   font-size: var(--fs-sm);
+  font-family: inherit;
   cursor: pointer;
-  transition: background var(--dur-fast) var(--ease-out),
-              transform var(--dur-fast) var(--ease-out);
+  transition: background var(--dur-fast) var(--ease-out);
 }
 .btn-cancel:hover {
-  background: rgba(255, 138, 155, 0.10);
-}
-.btn-cancel:active {
-  transform: scale(0.98);
+  background: var(--accent-clay-weak);
 }
 
 .notify-status {
@@ -199,22 +191,16 @@ defineExpose({ open });
 .btn-close {
   margin-top: var(--space-3);
   padding: 0.3rem 1.2rem;
-  background: var(--bg-soft);
-  border: 1px solid var(--border-mid);
-  border-radius: var(--radius-sm);
+  background: transparent;
+  border: none;
   font-size: var(--fs-sm);
+  font-family: inherit;
   color: var(--text-muted);
   cursor: pointer;
-  transition: background var(--dur-fast) var(--ease-out),
-              color var(--dur-fast) var(--ease-out),
-              transform var(--dur-fast) var(--ease-out);
+  transition: color var(--dur-fast) var(--ease-out);
 }
 .btn-close:hover {
-  background: var(--bg-hover);
-  color: var(--text-base);
-}
-.btn-close:active {
-  transform: scale(0.98);
+  color: var(--text-strong);
 }
 
 @media (prefers-reduced-motion: reduce) {

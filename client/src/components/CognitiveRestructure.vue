@@ -6,11 +6,11 @@
       <!-- 对比卡片 -->
       <div class="compare-cards">
         <div class="cc-thought">
-          <div class="cc-header">💭 常见想法</div>
+          <div class="cc-header">常见想法</div>
           <p>{{ exercise.thought }}</p>
         </div>
         <div class="cc-fact">
-          <div class="cc-header">🔬 科学事实</div>
+          <div class="cc-header">科学事实</div>
           <p>{{ exercise.fact }}</p>
         </div>
       </div>
@@ -44,13 +44,12 @@
         :disabled="!thoughtRecord.trim() || !factCheck.trim() || submitting"
         @click="doSubmit"
       >
-        {{ submitting ? '提交中...' : '✅ 提交练习' }}
+        {{ submitting ? '提交中...' : '提交练习' }}
       </button>
     </div>
 
     <!-- 已完成状态 -->
     <div v-if="isCompleted" class="completed-state">
-      <div class="complete-icon">🎉</div>
       <h3>今日认知训练已完成！</h3>
       <p>你已经迈出了改变睡眠信念的重要一步。明天会有新的练习。</p>
       <div class="completed-content" v-if="completedData">
@@ -117,17 +116,14 @@ onMounted(loadTask);
 
 .day-badge {
   display: inline-block;
-  background: var(--bg-glass);
-  border: 1px solid var(--border-soft);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  color: var(--accent-purple);
+  background: var(--primary-weak);
+  border: 1px solid transparent;
+  color: var(--primary-strong);
   padding: 0.25rem 0.8rem;
   border-radius: var(--radius-pill);
   font-size: var(--fs-xs);
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: var(--space-2);
-  box-shadow: var(--glow-purple);
 }
 
 .compare-cards {
@@ -140,18 +136,9 @@ onMounted(loadTask);
 .cc-thought, .cc-fact {
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
-  background: var(--bg-glass);
+  background: var(--bg-surface);
   border: 1px solid var(--border-soft);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   box-shadow: var(--shadow-card);
-  transition: transform var(--dur-base) var(--ease-out),
-              box-shadow var(--dur-base) var(--ease-out);
-}
-
-.cc-thought:hover, .cc-fact:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-soft), var(--glow-purple);
 }
 
 .cc-thought {
@@ -186,13 +173,11 @@ onMounted(loadTask);
 .exercise-form { display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-3); }
 
 .form-item {
-  background: var(--bg-glass);
+  background: var(--bg-surface);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
   padding: var(--space-3);
   box-shadow: var(--shadow-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .form-item label {
@@ -207,7 +192,7 @@ onMounted(loadTask);
 .input-textarea {
   width: 100%;
   padding: 0.6rem 0.8rem;
-  background: var(--bg-soft);
+  background: var(--bg-sunken);
   border: 1px solid var(--border-mid);
   border-radius: var(--radius-sm);
   font-size: var(--fs-md);
@@ -222,44 +207,37 @@ onMounted(loadTask);
 .input-textarea::placeholder { color: var(--text-faint); }
 .input-textarea:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-weak);
+  box-shadow: var(--focus-ring);
 }
 
 .btn-submit {
   width: 100%;
   padding: 0.8rem;
-  background: var(--accent-purple);
+  background: var(--primary);
   color: var(--text-on-primary);
   border: none;
   border-radius: var(--radius-pill);
   font-size: var(--fs-lg);
-  font-weight: 600;
+  font-family: inherit;
+  font-weight: 500;
   cursor: pointer;
-  transition: all var(--dur-base) var(--ease-out);
-  box-shadow: var(--glow-purple);
+  transition: background var(--dur-base) var(--ease-out);
 }
 
-.btn-submit:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--glow-purple), var(--shadow-soft);
+.btn-submit:hover:not(:disabled) {
+  background: var(--primary-strong);
 }
 
-.btn-submit:active { transform: scale(0.98); }
-
-.btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .completed-state {
   text-align: center;
   padding: var(--space-5) var(--space-3);
-  background: var(--bg-glass);
+  background: var(--bg-surface);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
-
-.complete-icon { font-size: 3rem; margin-bottom: var(--space-2); }
 
 .completed-state h3 { color: var(--text-strong); margin-bottom: var(--space-1); }
 
@@ -267,7 +245,7 @@ onMounted(loadTask);
 
 .completed-content {
   margin-top: var(--space-3);
-  background: var(--bg-soft);
+  background: var(--bg-sunken);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
   padding: var(--space-3);
@@ -283,13 +261,12 @@ onMounted(loadTask);
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--accent-mint);
-  color: var(--text-on-primary);
+  background: var(--text-strong);
+  color: var(--bg-base);
   padding: 0.6rem 1.5rem;
-  border-radius: var(--radius-pill);
-  font-weight: 600;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
   z-index: 100;
-  box-shadow: var(--glow-mint);
   animation: fadeInOut 2.5s ease;
 }
 

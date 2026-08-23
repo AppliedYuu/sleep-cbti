@@ -1,13 +1,13 @@
 /**
  * 界面主题（背景色 / 字体颜色）工具
- * 默认值 = 用户可重置的默认外观：
- *   背景色 bgColor    #E7DFCA（米色纸底）
- *   字体颜色 textColor #000000（黑色字体）
+ * 默认值 = 纸与墨主题的默认外观（与 styles/theme.css 保持一致）：
+ *   背景 bgColor    #F7F4ED（奶白纸底）
+ *   字体 textColor  #2A2A28（浓墨）
  */
 
 export const DEFAULT_THEME = {
-  bgColor: '#E7DFCA',
-  textColor: '#000000',
+  bgColor: '#F7F4ED',
+  textColor: '#2A2A28',
 };
 
 /** 校验 #RGB / #RRGGBB，返回统一大写 #RRGGBB，非法返回 null */

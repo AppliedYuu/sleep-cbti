@@ -43,18 +43,17 @@ const accentColor = computed(() => {
   box-shadow: var(--shadow-card);
   color: var(--text-base);
   text-decoration: none;
-  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  transition: box-shadow 0.22s ease, border-color 0.22s ease;
 }
 
+/* glass 属性已废弃（保留兼容旧调用），映射为实体纸卡 */
 .app-card--glass {
-  background: var(--bg-glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--bg-surface);
 }
 
+/* glow 属性已废弃，仅保留主色描边语义 */
 .app-card--glow {
   border-color: var(--border-glow);
-  box-shadow: var(--shadow-card), var(--glow-primary);
 }
 
 .app-card--accent {
@@ -63,7 +62,7 @@ const accentColor = computed(() => {
 
 a.app-card:hover,
 .app-card.is-clickable:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card), var(--glow-primary);
+  box-shadow: var(--shadow-float);
+  border-color: var(--border-mid);
 }
 </style>

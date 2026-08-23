@@ -1,6 +1,9 @@
 <template>
   <div class="app-empty">
-    <div class="empty-icon">{{ icon }}</div>
+    <svg class="empty-icon" viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="17" fill="none" stroke="var(--border-mid)" stroke-width="2"/>
+      <circle cx="40" cy="26" r="15" fill="var(--bg-base)"/>
+    </svg>
     <p class="empty-text">{{ text }}</p>
     <slot />
   </div>
@@ -8,7 +11,7 @@
 
 <script setup>
 defineProps({
-  icon: { type: String, default: '🌙' },
+  icon: { type: String, default: '' }, // 已废弃：保留参数兼容旧调用，不再渲染 emoji
   text: { type: String, default: '暂无数据' },
 });
 </script>
@@ -25,10 +28,9 @@ defineProps({
 }
 
 .empty-icon {
-  font-size: 3rem;
+  width: 56px;
+  height: 56px;
   margin-bottom: 0.6rem;
-  opacity: 0.8;
-  filter: drop-shadow(0 0 16px var(--primary-glow));
 }
 
 .empty-text {
