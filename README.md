@@ -90,8 +90,9 @@ cp server/.env.example server/.env
 
 ## 部署
 
-- **后端**：`railway.json` 配置 Railway 部署；数据库使用云 MySQL（`DATABASE_URL`）。敏感值请通过平台环境变量 / Secret 注入，不要写进仓库。
 - **前端站点**：`.github/workflows/deploy.yml` 将 `docs/` 发布到 GitHub Pages。
+- **后端**：`railway.json` 配置 Railway 部署；数据库使用云 MySQL（`DATABASE_URL`）。敏感值请通过平台环境变量 / Secret 注入，不要写进仓库。
+- **「页面上 GitHub Pages + 后端跑自己电脑」混合方案**（自有域名 + Cloudflare 隧道）：见 [DEPLOY-LOCAL.md](./DEPLOY-LOCAL.md)。
 
 ## 安全约定
 
